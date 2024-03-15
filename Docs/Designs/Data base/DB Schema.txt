@@ -3,4 +3,4 @@ DB online bookstore Schema:
 Books (ID[PK] , price , genre , title , author , quantity , description, ownerID[FK])
 Users (ID[PK] , name , userName , password , role)
 Reviews (ID[PK] , userID[FK] , bookID[FK] , rate , comment)
-BorrowRequests (ID[PK] , lenderID[FK] , borrowerID[FK] , bookID ,  status)
+BorrowRequests (ID[PK] , lenderID[FK] , borrowerID[FK] , bookID[FK] ,  status)

@@ -1,44 +1,65 @@
 package DbContext;
 
+import BuisnessLogic.Models.User;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class DbConnection {
-    public Connection connectToDb(String dbName, String userName, String password){
+    private final String url = "jdbc:postgresql://localhost:5432/";
+    private final String dbName = "BookStore";
+    private final String userName = "postgres";
+    private final String password = "postgres";
+
+    private final Connection connection ;
+
+    public DbConnection() {
+        connection = connectToDb();
+    }
+
+    private Connection connectToDb(){
+        //System.out.println("in connect to db function");
         Connection connection = null;
         try {
-            Class.forName("org.postgresql.Driver");
-            connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/"+dbName,userName,password);
+            //Class.forName("org.postgresql.Driver");
+            connection = DriverManager.getConnection(url+dbName,userName,password);
             if(connection != null){
                 System.out.println("Connected to postgresql successfully");
             }else{
                 System.out.println("Connection Failed");
             }
         }catch (Exception e){
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
         return connection;
     }
-    public void createTable(Connection connection, String tableName) {
-        PreparedStatement statement = null;
 
-        try {
-            String sql = "CREATE TABLE " + tableName + " (id INTEGER, name VARCHAR(200), address VARCHAR(200), PRIMARY KEY (id))";
-            statement = connection.prepareStatement(sql);
-            statement.executeUpdate();
-            System.out.println(tableName + " Table created successfully");
-        } catch (SQLException e) {
-            System.err.println("Error creating table: " + e.getMessage());
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) {
-                    System.err.println("Error closing statement: " + e.getMessage());
-                }
-            }
-        }
-    }
+     public <T> ArrayList<T> select(Class<T> tClass , String query ) {
+         ResultSet resultSet;
+         ArrayList<T> result = new ArrayList<>();
+         try {
+             //String query = "select * from users";
+             Statement statement = connection.createStatement();
+             resultSet = statement.executeQuery(query);
+
+             ObjectMapper mapper = new ObjectMapper();
+             while (resultSet.next()) {  //loops on result rows
+
+                 T object = mapper.mapObject(tClass,resultSet); //passes object type and result set
+                 result.add(object);
+                 System.out.println(object);
+             }
+             return result;
+         } catch (Exception e) {
+             e.printStackTrace();
+             System.out.println("Error in selection statement");
+             return  null;
+         }
+
+     }
 
 }
+
+
