@@ -38,7 +38,7 @@ public class UUIDAuthenticator implements  IAuthenticator{
 
 
         //Step 2. add user to database
-        query = "insert into users (name , username , password , role) values ('" + _name + "' , '" + _userName + "' , '" +_password + "' , 'user')" ;
+        query = "insert into users (name , username , password , role) values ('" + _name + "' , '" + _userName + "' , '" +_password + "' , 'user')" ;//role = user by default
         System.out.println("query = " + query);
         Boolean queryResult = dbConnection.create(query);
 
@@ -61,21 +61,53 @@ public class UUIDAuthenticator implements  IAuthenticator{
             System.out.println("user id = -1");
             return errorAddingUser();
         }
-        ActiveDatabase activeDatabase = ActiveDatabase.getInstance();
-        UUID newUuid = activeDatabase.addUser(userId);
+        UUID uuid = addUserToActiveDb(result.get(0).id);
         response.status = 200;
         response.message = "User added successfully";
-        response.object = newUuid;
+        response.object = uuid;
         return response;
 
     }
 
     //returns uuid if user exists and null otherwise
-    public Response signIn( String userName , String password){
+    public Response signIn( String _userName , String _password){
         ///Steps
         ///1. get user from DB by userName
         ///2. add to Active DB
-        return null;
+
+        //Step 1. get user from DB by userName
+        Response response  = new Response();
+        if( _userName == null || _password == null){  //used == not .equals() to compare references not string values
+            response.status = 402; //custom error for null values
+            response.message = "null arguments are not valid , please try again";
+            return response;
+        }
+        DbConnection dbConnection = new DbConnection();
+        String query = "";
+
+        query = "select * from users where username='" + _userName + "'";
+
+
+        ArrayList<User> result = dbConnection.select(User.class  ,query);
+        if(result.isEmpty()){ //custom error status 400 for reserved userName
+            response.status = 404;
+            response.message = "Error : userName is not found!";
+            return response;
+        }
+
+
+        if(!result.get(0).password.equals(_password)){
+            response.status = 401;
+            response.message = "Error : Wrong Password!";
+            return response;
+        }
+
+        //Step 2. add to Active DB
+        UUID uuid = addUserToActiveDb(result.get(0).id);
+        response.status = 200;
+        response.message = "User singed in successfully";
+        response.object = uuid;
+        return response;
     }
 
     private Response errorAddingUser(){
@@ -85,5 +117,11 @@ public class UUIDAuthenticator implements  IAuthenticator{
         return response;
     }
 
+    private UUID addUserToActiveDb(int id){
+        ActiveDatabase activeDatabase = ActiveDatabase.getInstance();
+        UUID newUuid = activeDatabase.addUser(id);
+
+        return newUuid;
+    }
 
 }

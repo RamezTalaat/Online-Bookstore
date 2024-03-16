@@ -31,7 +31,7 @@ public class Main {
        // Db.createTable(connection, "za3bola");
 
         IAuthenticator authenticator = new UUIDAuthenticator();
-        Response response = authenticator.signUp("tarek" , "tarek" , "tarek123");
+        Response response = authenticator.signIn( "tarekwer" , "tarek123wer");
         System.out.println(response);
         ActiveDatabase db = ActiveDatabase.getInstance();
         db.printActiveDatabase();
