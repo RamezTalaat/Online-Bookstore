@@ -36,6 +36,10 @@ public class DbConnection {
         return connection;
     }
 
+    public Connection getConnection(){
+        return connection;
+    }
+
      public <T> ArrayList<T> select(Class<T> tClass , String query ) {
          ResultSet resultSet;
          ArrayList<T> result = new ArrayList<>();
@@ -60,13 +64,24 @@ public class DbConnection {
 
      }
 
-     public <T> void create(Class<T> tClass ){
+     public boolean create(String  query){
         try{
-
+            Statement statement = connection.createStatement();
+            int rowsAffected = statement.executeUpdate(query);
+            if(rowsAffected > 0){
+                System.out.println("Successful update");
+                return true;
+            }
+            else{
+                System.out.println("Unsuccessful update");
+                return false;
+            }
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("Error in create/update/delete operation");
+
         }
+        return false;
      }
 
 }

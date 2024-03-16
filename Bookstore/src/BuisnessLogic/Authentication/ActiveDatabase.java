@@ -38,8 +38,11 @@ public class ActiveDatabase {
     }
 
     public void printActiveDatabase(){
-        if(activeDb.isEmpty())
+        if(activeDb.isEmpty()){
+            System.out.println("No current entries in Active Database");
             return;
+        }
+
         for(Map.Entry<UUID , Integer> pair: activeDb.entrySet()){
             System.out.println("uuid = " + pair.getKey() + " , id = " + pair.getValue());
         }

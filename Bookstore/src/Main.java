@@ -1,10 +1,14 @@
 import BuisnessLogic.Authentication.ActiveDatabase;
+import BuisnessLogic.Authentication.IAuthenticator;
+import BuisnessLogic.Authentication.Response;
+import BuisnessLogic.Authentication.UUIDAuthenticator;
 import BuisnessLogic.Models.Book;
 import BuisnessLogic.Models.BorrowRequest;
 import BuisnessLogic.Models.Review;
 import BuisnessLogic.Models.User;
 import DbContext.DbConnection;
 
+import java.net.Authenticator;
 import java.sql.Array;
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -18,16 +22,18 @@ public class Main {
 //            System.out.println(users.get(i));
 //        }
 
-        ActiveDatabase db = ActiveDatabase.getInstance();
-        db.printActiveDatabase();
-        UUID uuid =  db.addUser(11);
+//        ActiveDatabase db = ActiveDatabase.getInstance();
+//        db.printActiveDatabase();
+//        UUID uuid =  db.addUser(11);
 
-        System.out.println("User id = "  + db.getUserID(uuid));
-        db.printActiveDatabase();
-        ActiveDatabase db2 = ActiveDatabase.getInstance();
-        System.out.println("New DB");
-        db.printActiveDatabase();
+
         //Connection connection = Db.connectToDb();
        // Db.createTable(connection, "za3bola");
+
+        IAuthenticator authenticator = new UUIDAuthenticator();
+        Response response = authenticator.signUp("mosa" , "baraka" , "zozo");
+        System.out.println(response);
+        ActiveDatabase db = ActiveDatabase.getInstance();
+        db.printActiveDatabase();
     }
 }
