@@ -15,7 +15,6 @@ public class UUIDAuthenticator implements  IAuthenticator{
         ///2. add user to database
         ///3. add to Active DB
 
-        System.out.println("in sing up");
         //Step 1. check userName in database
         Response response  = new Response();
         if(_name == null || _userName == null || _password == null){  //used == not .equals() to compare references not string values
@@ -25,65 +24,38 @@ public class UUIDAuthenticator implements  IAuthenticator{
         }
         DbConnection dbConnection = new DbConnection();
         String query = "";
-        try {
 
-            query = "select * from users where username='" + _userName + "'";
-            System.out.println("query = " + query);
-//            query = "select * from users where username = ?";
-//            PreparedStatement preparedStatement = dbConnection.getConnection().prepareStatement(query);
-//            preparedStatement.setString(1,_userName);
-//            System.out.println("query = " + query);
-//            System.out.println("prepared statement = " + preparedStatement.toString());
-            ArrayList<User> result = dbConnection.select(User.class  ,query);
-            if(!result.isEmpty()){ //custom error status 400 for reserved userName
-                response.status = 400;
-                response.message = "userName already reserved , try another one";
-                return response;
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.println("userName already reserved , try another one");
+        query = "select * from users where username='" + _userName + "'";
+        System.out.println("query = " + query);
+
+        ArrayList<User> result = dbConnection.select(User.class  ,query);
+        if(!result.isEmpty()){ //custom error status 400 for reserved userName
+            response.status = 400;
+            response.message = "userName already reserved , try another one";
+            return response;
         }
+
 
 
         //Step 2. add user to database
-        try {
-            query = "insert into users (name , username , password , role) values ('" + _name + "' , '" + _userName + "' , '" +_password + "' , 'user')" ;
-            System.out.println("query = " + query);
-            dbConnection.create(query);
-//            query = "insert into users (name , username , password , role) values (?,?,?,user)";
-//            PreparedStatement preparedStatement = dbConnection.getConnection().prepareStatement(query);
-//            preparedStatement.setString(1,_name);
-//            preparedStatement.setString(2,_userName);
-//            preparedStatement.setString(3,_password);
+        query = "insert into users (name , username , password , role) values ('" + _name + "' , '" + _userName + "' , '" +_password + "' , 'user')" ;
+        System.out.println("query = " + query);
+        Boolean queryResult = dbConnection.create(query);
 
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.println("Error : problem in adding user to database");
+        if(!queryResult)
             return errorAddingUser();
-        }
 
         //Step 3. add to Active DB
         int userId = -1;
-        try {
-            query = "select * from users where username ='" + _userName + "'";
-//            PreparedStatement preparedStatement = dbConnection.getConnection().prepareStatement(query);
-//            preparedStatement.setString(1,_userName);
-            System.out.println("query = " + query);
-            ArrayList<User> result = dbConnection.select(User.class ,query);
-            System.out.println("result set = " + result.toString());
-            if(result.size() != 1){  //we want only 1 user
-                System.out.println("result set problem");
-                return  errorAddingUser();
-            }
-            userId = result.get(0).id;
-
-
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.println("Error : problem in adding user to database");
+        query = "select * from users where username ='" + _userName + "'";
+        System.out.println("query = " + query);
+        result = dbConnection.select(User.class ,query);
+        System.out.println("result set = " + result.toString());
+        if(result.size() != 1){  //we want only 1 user
+            System.out.println("result set problem");
             return  errorAddingUser();
         }
+        userId = result.get(0).id;
 
         if(userId == -1){
             System.out.println("user id = -1");
@@ -112,4 +84,6 @@ public class UUIDAuthenticator implements  IAuthenticator{
         response.message = "Error : problem in adding user to database";
         return response;
     }
+
+
 }
