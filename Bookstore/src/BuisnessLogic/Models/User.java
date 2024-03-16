@@ -9,6 +9,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "USER=> id = " + id + " , name = " + name + " , userName = " + userName + " , password = " + password;
+        return "USER=> id = " + id + " , name = " + name + " , userName = " + userName +
+                " , password = " + password + " , role = " + role;
     }
 }

@@ -49,7 +49,7 @@ public class DbConnection {
 
                  T object = mapper.mapObject(tClass,resultSet); //passes object type and result set
                  result.add(object);
-                 System.out.println(object);
+                 //System.out.println(object);
              }
              return result;
          } catch (Exception e) {
