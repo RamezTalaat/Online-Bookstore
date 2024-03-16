@@ -60,6 +60,15 @@ public class DbConnection {
 
      }
 
+     public <T> void create(Class<T> tClass ){
+        try{
+
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("Error in create/update/delete operation");
+        }
+     }
+
 }
 
 
