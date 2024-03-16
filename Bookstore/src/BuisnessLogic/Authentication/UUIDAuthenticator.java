@@ -26,7 +26,7 @@ public class UUIDAuthenticator implements  IAuthenticator{
         String query = "";
 
         query = "select * from users where username='" + _userName + "'";
-        System.out.println("query = " + query);
+        //System.out.println("query = " + query);
 
         ArrayList<User> result = dbConnection.select(User.class  ,query);
         if(!result.isEmpty()){ //custom error status 400 for reserved userName
@@ -39,8 +39,8 @@ public class UUIDAuthenticator implements  IAuthenticator{
 
         //Step 2. add user to database
         query = "insert into users (name , username , password , role) values ('" + _name + "' , '" + _userName + "' , '" +_password + "' , 'user')" ;//role = user by default
-        System.out.println("query = " + query);
-        Boolean queryResult = dbConnection.create(query);
+        //System.out.println("query = " + query);
+        Boolean queryResult = dbConnection.operate(query);
 
         if(!queryResult)
             return errorAddingUser();

@@ -64,7 +64,7 @@ public class DbConnection {
 
      }
 
-     public boolean create(String  query){
+     public boolean operate(String  query){
         try{
             Statement statement = connection.createStatement();
             int rowsAffected = statement.executeUpdate(query);

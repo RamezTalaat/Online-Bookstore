@@ -2,16 +2,7 @@ import BuisnessLogic.Authentication.ActiveDatabase;
 import BuisnessLogic.Authentication.IAuthenticator;
 import BuisnessLogic.Authentication.Response;
 import BuisnessLogic.Authentication.UUIDAuthenticator;
-import BuisnessLogic.Models.Book;
-import BuisnessLogic.Models.BorrowRequest;
-import BuisnessLogic.Models.Review;
-import BuisnessLogic.Models.User;
-import DbContext.DbConnection;
 
-import java.net.Authenticator;
-import java.sql.Array;
-import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class Main {
