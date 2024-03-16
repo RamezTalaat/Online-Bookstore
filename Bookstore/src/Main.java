@@ -32,8 +32,11 @@ public class Main {
 
         IAuthenticator authenticator = new UUIDAuthenticator();
         Response response = authenticator.signIn( "tarekwer" , "tarek123wer");
+        UUID uuid = (UUID) response.object;
         System.out.println(response);
         ActiveDatabase db = ActiveDatabase.getInstance();
+        db.printActiveDatabase();
+        authenticator.signOut(uuid);
         db.printActiveDatabase();
     }
 }

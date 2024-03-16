@@ -110,6 +110,26 @@ public class UUIDAuthenticator implements  IAuthenticator{
         return response;
     }
 
+    public Response signOut (UUID uuid){
+        Response response = new Response();
+        if(uuid == null){
+            response.status = 402;
+            response.message = "Error : UUID ";
+        }
+
+        ActiveDatabase activeDatabase = ActiveDatabase.getInstance();
+        activeDatabase.removeUser(uuid);
+        int id = activeDatabase.getUserID(uuid);
+        if(id == -1){
+            response.status = 200;
+            response.message = "User Removed successfully";
+            return response;
+        }
+        response.status = 500;
+        response.message = "Error : Could not remove user";
+        return response;
+    }
+
     private Response errorAddingUser(){
         Response response = new Response();
         response.status = 500; //code for internal server error
