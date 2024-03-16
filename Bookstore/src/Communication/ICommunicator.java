@@ -1,6 +1,6 @@
 package Communication;
 
-public interface ICommunication {
+public interface ICommunicator {
     public String receiveMessage();
     public void sendMessage(String message);
 }

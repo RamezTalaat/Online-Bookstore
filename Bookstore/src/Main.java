@@ -2,6 +2,7 @@ import BuisnessLogic.Authentication.ActiveDatabase;
 import BuisnessLogic.Authentication.IAuthenticator;
 import BuisnessLogic.Authentication.Response;
 import BuisnessLogic.Authentication.UUIDAuthenticator;
+import Communication.ServerCommunicator;
 
 import java.util.UUID;
 
@@ -21,13 +22,15 @@ public class Main {
         //Connection connection = Db.connectToDb();
        // Db.createTable(connection, "za3bola");
 
-        IAuthenticator authenticator = new UUIDAuthenticator();
-        Response response = authenticator.signIn( "tarekwer" , "tarek123wer");
-        UUID uuid = (UUID) response.object;
-        System.out.println(response);
-        ActiveDatabase db = ActiveDatabase.getInstance();
-        db.printActiveDatabase();
-        authenticator.signOut(uuid);
-        db.printActiveDatabase();
+//        IAuthenticator authenticator = new UUIDAuthenticator();
+//        Response response = authenticator.signIn( "tarekwer" , "tarek123wer");
+//        UUID uuid = (UUID) response.object;
+//        System.out.println(response);
+//        ActiveDatabase db = ActiveDatabase.getInstance();
+//        db.printActiveDatabase();
+//        authenticator.signOut(uuid);
+//        db.printActiveDatabase();
+
+        ServerCommunicator serverCommunicator = new ServerCommunicator();
     }
 }
