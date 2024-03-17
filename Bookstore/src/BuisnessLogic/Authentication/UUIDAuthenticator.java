@@ -105,7 +105,7 @@ public class UUIDAuthenticator implements  IAuthenticator{
         //Step 2. add to Active DB
         UUID uuid = addUserToActiveDb(result.get(0).id);
         response.status = 200;
-        response.message = "User singed in successfully";
+        response.message = "User signed in successfully";
         response.object = uuid;
         return response;
     }
