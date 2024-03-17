@@ -3,8 +3,10 @@ import BuisnessLogic.Authentication.IAuthenticator;
 import BuisnessLogic.Authentication.Response;
 import BuisnessLogic.Authentication.UUIDAuthenticator;
 import BuisnessLogic.Controllers.BookController;
+import BuisnessLogic.Models.Book;
 import Communication.ServerCommunicator;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class Main {
@@ -19,7 +21,12 @@ public class Main {
 //        db.printActiveDatabase();
 //        UUID uuid =  db.addUser(11);
         BookController book = new BookController();
-        book.removeBook(2);
+        ArrayList<Book> res= book.searchForBook("genre","Sci-fi");
+        int i = 0;
+        while( i != res.size()){
+            System.out.println(res.get(i));
+            i++;
+        }
 
         //Connection connection = Db.connectToDb();
        // Db.createTable(connection, "za3bola");

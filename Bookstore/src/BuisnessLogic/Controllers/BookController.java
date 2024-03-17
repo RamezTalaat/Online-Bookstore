@@ -19,7 +19,9 @@ public class BookController {
             int numOfBooks = result.get(0).quantity ;
             query = "update books set quantity ="+(numOfBooks - 1)+" where id ="+bookID;
             res = dbConnection.operate(query);
-            System.out.println("The book has been removed from the books and the number of books now: "+result.get(0).quantity);
+            response.status=200;
+            response.message="The book has been removed from the books and the number of books now: "+result.get(0).quantity;
+            System.out.println(response);
             return res;
         }
         String sql = "Delete from books where id ="+bookID;
@@ -28,6 +30,49 @@ public class BookController {
             System.out.println("Book deleted Successfully");
             return true;
         }
+        System.out.println("There is a problem");
         return false;
+    }
+    public ArrayList<Book> searchForBook(String str, String value){
+        DbConnection dbConnection = new DbConnection();
+        Response response = new Response();
+        ArrayList<Book> result;
+        String query;
+        switch(str){
+            case "title":
+                query = "select * from books where title ='"+value+"'";
+                result = dbConnection.select(Book.class, query);
+                if(!result.isEmpty()){
+                    response.status=200;
+                    response.message="list returned Successfully";
+                    return result;
+                }
+                System.out.println("There is no books with this "+str);
+                break;
+            case "author":
+                query = "select * from books where author ='"+value+"'";
+                result = dbConnection.select(Book.class, query);
+                if(!result.isEmpty()){
+                    response.status=200;
+                    response.message="list returned Successfully";
+                    return result;
+                }
+                System.out.println("There is no books with this "+str);
+                break;
+            case "genre":
+                query = "select * from books where genre ='"+value+"'";
+                result = dbConnection.select(Book.class, query);
+                if(!result.isEmpty()){
+                    response.status=200;
+                    response.message="list returned Successfully";
+                    return result;
+                }
+                System.out.println("There is no books with this "+str);
+                break;
+            default:
+                System.out.println("please enter valid data");
+                break;
+        }
+        return null;
     }
 }
