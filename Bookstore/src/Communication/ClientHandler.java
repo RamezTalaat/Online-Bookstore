@@ -6,7 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.Socket;
 
-public class ClientHandler implements Runnable  {
+public class ClientHandler implements Runnable , ICommunicator {
     private Socket clientSocket;
     private static DataOutputStream outputStream;
     private static DataInputStream inputStream;
@@ -28,7 +28,7 @@ public class ClientHandler implements Runnable  {
             //
             String message = "";
             while (!message.equals("end")) {
-                message = inputStream.readUTF();
+                message = receiveMessage();
                 System.out
                         .println("Message from client of port " + clientSocket.getPort() + ": ( " + message + " )");
 
@@ -42,4 +42,25 @@ public class ClientHandler implements Runnable  {
     }
 
 
+    @Override
+    public String receiveMessage() {
+        try{
+            String message = inputStream.readUTF();
+            return message;
+        }catch (Exception e){
+            System.out.println("Error : could not receive message properly from client at "+  clientSocket.getPort());
+        }
+       return null;
+
+    }
+
+    @Override
+    public void sendMessage(String message) {
+        try{
+            outputStream.writeUTF(message);
+
+        }catch (Exception e){
+            System.out.println("Error : could not send message properly to client at "+  clientSocket.getPort());
+        }
+    }
 }

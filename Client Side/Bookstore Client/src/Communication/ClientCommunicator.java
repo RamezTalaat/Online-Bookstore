@@ -13,7 +13,8 @@ public class ClientCommunicator implements ICommunicator {
        try {
            connectToServer();
            inputStream = new DataInputStream(new BufferedInputStream(server.getInputStream()));
-           outputStream = new DataOutputStream(new BufferedOutputStream(server.getOutputStream()));
+           outputStream = new DataOutputStream(server.getOutputStream());
+           //DataOutputStream out = new DataOutputStream(server.getOutputStream());
        }catch (Exception e){
            e.printStackTrace();
            System.out.println("Error in connecting to server");

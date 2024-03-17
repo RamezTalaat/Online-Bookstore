@@ -19,6 +19,7 @@ public class ServerCommunicator {
                 //New Client thread instantiation
                 Thread newClientThread = new Thread(new ClientHandler(clientSocket));
                 newClientThread.start();
+                System.out.println("----> New Thread started");
 
             }
         } catch (Exception e) {
