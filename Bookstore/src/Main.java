@@ -1,13 +1,4 @@
-import BuisnessLogic.Authentication.ActiveDatabase;
-import BuisnessLogic.Authentication.IAuthenticator;
-import BuisnessLogic.Authentication.Response;
-import BuisnessLogic.Authentication.UUIDAuthenticator;
-import BuisnessLogic.Controllers.BookController;
-import BuisnessLogic.Models.Book;
 import Communication.ServerCommunicator;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 public class Main {
     public static void main(String[] args) {

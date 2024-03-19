@@ -6,5 +6,5 @@ public interface IAuthenticator {
     public Response signUp(String name , String userName , String password);
     public Response signIn( String userName , String password);
 
-    public Response signOut( UUID uuid);
+//    public Response signOut( UUID uuid);
 }

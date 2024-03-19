@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class UserController {
-    private  User currentUser;
+    private  final User currentUser;
     private static ICommunicator communicator;
     private static BufferedReader reader;
     public UserController(ICommunicator _communicator ,User _user){
@@ -26,10 +26,11 @@ public class UserController {
         while (choice != 7){//sign out choice
             switch (choice){
                 case 1:{
-                    BrowseBooks();
+                    browseBooks();
                     break;
                 }
                 case 2:{
+
                     break;
                 }
                 case 3:{
@@ -42,6 +43,7 @@ public class UserController {
                     break;
                 }
                 case 6:{
+                    submitABorrowRequest();
                     break;
                 }
                 case 7:{
@@ -59,17 +61,78 @@ public class UserController {
 
     }
 
-    public void BrowseBooks(){
+    public void submitABorrowRequest(){
+        // to get books to borrow
+        ArrayList<Book> books =  browseBooks();
+        if(books == null){
+            System.out.println("Sorry , No current books to borrow!");
+            return;
+        }
+        int bookNumber = -1;
+        String bookNumberString= "";
+        while (bookNumber > books.size() || bookNumber < 0){
+            System.out.print("Enter the book number you want to borrow (ex. 1): ");
+            try {
+                bookNumberString =  reader.readLine();
+                bookNumber = Integer.parseInt(bookNumberString);
+            }catch (Exception e){
+                System.out.println("Sorry , please re-enter a valid book number");
+                bookNumber = -1;
+            }
+        }
+        bookNumber--;
+        System.out.println("book number = "+bookNumber);
+        String choice = "";
+        System.out.println("Are you sure you want to submit a borrow request for this book ? (yes or no)");
+        System.out.println(books.get(bookNumber));
+        try{
+            choice = reader.readLine();
+            choice = choice.toLowerCase();
+            if(!choice.equals("yes") && !choice.equals("no") ){
+                System.out.println("Error : we could not comprehend your input! , please try again");
+                return;
+            }
+            if(choice.equals("no")){
+                return;
+            }
+            System.out.println(currentUser);
+            if (books.get(bookNumber).ownerid == currentUser.id){
+                System.out.println("You already are the owner of this book");
+                return;
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+            System.out.println("Error : we could not comprehend your input!");
+        }
+
+        communicator.sendMessage("borrow request");
+        communicator.sendMessage(currentUser.id); // convert to strings
+        communicator.sendMessage(bookNumber);
+
+        Response response = new Response();
+        response = communicator.receiveResponse();
+        if(response.status != 200){
+            System.out.println("Sorry , the request was not submitted , try again");
+        }else{
+            System.out.println("Congrats , you request has been submitted successfully");
+        }
+
+    }
+    public ArrayList<Book> browseBooks(){
         communicator.sendMessage("browse");
         Response response = communicator.receiveResponse();
         if(response.status != 200){
-            System.out.println(response.message);
+            System.out.println("Looks like there is no current books to browse , sorry!");
+            return null;
         }else{
             ArrayList<Book> books= (ArrayList<Book>)response.object;
             for(int i = 0 ; i < books.size() ; i++){
-                System.out.println(books.get(i));
+                System.out.println(i+1 + ") " + books.get(i));
             }
+            return books;
         }
+
 
     }
     public int getUserChoice(){
@@ -81,7 +144,7 @@ public class UserController {
             System.out.println("3. Add a book to your inventory");
             System.out.println("4. Remove a book from your inventory");
             System.out.println("5. Check your requests history (ex. Accept/Reject incoming requests & Chat with borrower)");
-            System.out.println("6. Submit a borrow request");
+            System.out.println("6. borrow a book (submit a borrow request)");
             System.out.println("7. Sign Out");
             System.out.print("Choose an option:  ");
             try {

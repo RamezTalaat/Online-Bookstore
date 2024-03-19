@@ -2,7 +2,7 @@ package BuisnessLogic.Controllers;
 
 import BuisnessLogic.Authentication.IAuthenticator;
 import BuisnessLogic.Authentication.Response;
-import BuisnessLogic.Authentication.UUIDAuthenticator;
+import BuisnessLogic.Authentication.UserAuthenticator;
 import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
 
@@ -26,22 +26,21 @@ public class RegistrationController {
                     String name = communicator.receiveMessage();
                     String userName = communicator.receiveMessage();
                     String password = communicator.receiveMessage();
-                    IAuthenticator authenticator = new UUIDAuthenticator();
+                    IAuthenticator authenticator = new UserAuthenticator();
                     Response response = authenticator.signUp(name , userName , password);
                     communicator.sendResponse(response);
                     break;
                 }
                 case "sign in":{
-                    System.out.println("in sign in");
                     String userName = communicator.receiveMessage();
                     String password = communicator.receiveMessage();
-                    IAuthenticator authenticator = new UUIDAuthenticator();
+                    IAuthenticator authenticator = new UserAuthenticator();
                     Response response = authenticator.signIn( userName , password);
 
+                    communicator.sendResponse(response);
                     if(response.status == 200){
                         User currentUser = (User)response.object;
-                        response.object = null; //to not return the data back to client
-                        communicator.sendResponse(response);
+
                         if(response.message.equals("Admin signed in successfully")){
                             AdminController adminController = new AdminController(); //still not implemented
                         }else{
@@ -54,15 +53,15 @@ public class RegistrationController {
                     //communicator.sendResponse(response);
                     break;
                 } case "sign out":{
-                    System.out.println("in sign out");
-                    String  Suuid =  communicator.receiveMessage();//not implemented well yet , should receive UUID
-                    UUID uuid = UUID.fromString(Suuid);
-                    IAuthenticator authenticator = new UUIDAuthenticator();
-                    Response response = authenticator.signOut(uuid); //needs to be improved to take user id not uuid
-                    communicator.sendResponse(response);
-                    if(response.status == 200){
-                        //should close connection socket
-                    }
+//                    System.out.println("in sign out");
+//                    String  Suuid =  communicator.receiveMessage();//not implemented well yet , should receive UUID
+//                    UUID uuid = UUID.fromString(Suuid);
+//                    IAuthenticator authenticator = new UserAuthenticator();
+//                    Response response = authenticator.signOut(uuid); //needs to be improved to take user id not uuid
+//                    communicator.sendResponse(response);
+//                    if(response.status == 200){
+//                        //should close connection socket
+//                    }
                     break;
                 }default:{
                     Response response = new Response();

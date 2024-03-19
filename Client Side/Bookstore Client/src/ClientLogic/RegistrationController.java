@@ -41,6 +41,7 @@ public class RegistrationController {
         }
         if(response.status == 200){
             User user = (User)response.object;
+
             if(response.message.equals("Admin signed in successfully")){//admin path
                 System.out.println("Welcome Admin!");
                 AdminController adminController = new AdminController(communicator ,user); // not implemented yet

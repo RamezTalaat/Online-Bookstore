@@ -41,6 +41,25 @@ public class UserController {
                     communicator.sendResponse(response);
                     break;
                 }
+                case "borrow request":{
+                    System.out.println("In borrow request");
+                    RequestController requestController = new RequestController();
+                    String stringUserID = communicator.receiveMessage();
+                    String stringBookID = communicator.receiveMessage();
+                    int userId = Integer.parseInt(stringUserID);
+                    int bookId = Integer.parseInt(stringBookID);
+                    boolean result = requestController.submitBorrowRequest(userId , bookId);
+                    Response response = new Response();
+                    if(result){
+                        response.status = 200;
+                        response.message = "book borrow request submitted successfully";
+                    }else{
+                        response.status = 400;
+                        response.message = "could not submit borrow request!";
+                    }
+                    communicator.sendResponse(response);
+                    break;
+                }
                 case "sign out":{
                     System.out.println("User Signing out");
                     break;

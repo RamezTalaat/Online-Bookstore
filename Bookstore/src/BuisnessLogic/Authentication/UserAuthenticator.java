@@ -3,11 +3,10 @@ package BuisnessLogic.Authentication;
 import BuisnessLogic.Models.User;
 import DbContext.DbConnection;
 
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
-import java.util.UUID;
 
-public class UUIDAuthenticator implements  IAuthenticator{
+
+public class UserAuthenticator implements  IAuthenticator{
     //returns uuid if user was added and null otherwise
     public Response signUp(String _name , String _userName , String _password){
         ///Steps
@@ -114,16 +113,16 @@ public class UUIDAuthenticator implements  IAuthenticator{
         return response;
     }
 
-    public Response signOut (UUID uuid){
+    public Response signOut (int id){
         Response response = new Response();
-        if(uuid == null){
-            response.status = 402;
-            response.message = "Error : UUID ";
-        }
+//        if(uuid == null){
+//            response.status = 402;
+//            response.message = "Error : UUID ";
+//        }
 
-        ActiveDatabase activeDatabase = ActiveDatabase.getInstance();
-        activeDatabase.removeUser(uuid);
-        int id = activeDatabase.getUserID(uuid);
+//        ActiveDatabase activeDatabase = ActiveDatabase.getInstance();
+//        activeDatabase.removeUser(uuid);
+//        int id = activeDatabase.getUserID(uuid);
         if(id == -1){
             response.status = 200;
             response.message = "User Removed successfully";
@@ -141,11 +140,11 @@ public class UUIDAuthenticator implements  IAuthenticator{
         return response;
     }
 
-    private UUID addUserToActiveDb(int id){
-        ActiveDatabase activeDatabase = ActiveDatabase.getInstance();
-        UUID newUuid = activeDatabase.addUser(id);
-
-        return newUuid;
-    }
+//    private UUID addUserToActiveDb(int id){
+//        ActiveDatabase activeDatabase = ActiveDatabase.getInstance();
+//        UUID newUuid = activeDatabase.addUser(id);
+//
+//        return newUuid;
+//    }
 
 }
