@@ -1,6 +1,8 @@
 package BuisnessLogic.Models;
 
-public class Book {
+import java.io.Serializable;
+
+public class Book implements Serializable {
     public int id;
     public double price;
     public String author;

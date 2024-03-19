@@ -40,15 +40,17 @@ public class RegistrationController {
 
                     if(response.status == 200){
                         User currentUser = (User)response.object;
+                        response.object = null; //to not return the data back to client
+                        communicator.sendResponse(response);
                         if(response.message.equals("Admin signed in successfully")){
                             AdminController adminController = new AdminController(); //still not implemented
                         }else{
 
                             UserController userController = new UserController(communicator ,currentUser );
+                            userController.handleUser();
                         }
                     }
-                    response.object = null; //to not return the data back to client
-                    communicator.sendResponse(response);
+
                     //communicator.sendResponse(response);
                     break;
                 } case "sign out":{

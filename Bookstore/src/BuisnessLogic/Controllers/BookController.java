@@ -7,6 +7,10 @@ import DbContext.DbConnection;
 import java.util.ArrayList;
 
 public class BookController {
+    private DbConnection dbConnection;
+    public BookController(){
+        dbConnection= new DbConnection();
+    }
     public boolean removeBook(int bookID){
         Response response = new Response();
         String query = "select * from books where id ="+bookID;
@@ -34,7 +38,6 @@ public class BookController {
         return false;
     }
     public ArrayList<Book> searchForBook(String str, String value){
-        DbConnection dbConnection = new DbConnection();
         Response response = new Response();
         ArrayList<Book> result;
         String query;
@@ -74,5 +77,12 @@ public class BookController {
                 break;
         }
         return null;
+    }
+
+    public ArrayList<Book> browseBooks(){
+        String query = "select * from books";
+        ArrayList<Book> result ;
+        result = dbConnection.select(Book.class,query);
+        return result;
     }
 }

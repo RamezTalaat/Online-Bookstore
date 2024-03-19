@@ -1,6 +1,8 @@
 package BuisnessLogic.Models;
 
-public class Review {
+import java.io.Serializable;
+
+public class Review implements Serializable {
     public int id;
     public int userid;
     public int bookid;

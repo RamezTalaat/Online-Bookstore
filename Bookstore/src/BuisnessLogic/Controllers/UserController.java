@@ -1,8 +1,11 @@
 package BuisnessLogic.Controllers;
 
 import BuisnessLogic.Authentication.Response;
+import BuisnessLogic.Models.Book;
 import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
+
+import java.util.ArrayList;
 
 public class UserController {
     private static ICommunicator communicator;
@@ -20,7 +23,22 @@ public class UserController {
                 case "browse":{
                     System.out.println("user in browse function");
                     BookController bookController = new BookController();
-                    //bookController.browseBooks();
+                    ArrayList<Book> result = bookController.browseBooks();
+                    for(int i = 0 ; i < result.size() ; i++){
+                        System.out.println(result.get(i));
+                    }
+                    Response response = new Response();
+                    if(result.isEmpty()){
+                        response.status = 400;
+                        response.message = "No books to browse now";
+
+                    }else{
+                        response.status = 200;
+                        response.message = "books retrieved successfully";
+                        response.object = result;
+                    }
+                    System.out.println("browse response = " + response);
+                    communicator.sendResponse(response);
                     break;
                 }
                 case "sign out":{

@@ -1,6 +1,8 @@
 package BuisnessLogic.Models;
 
-public class BorrowRequest {
+import java.io.Serializable;
+
+public class BorrowRequest implements Serializable {
     public int id;
     public int lenderid;
     public int borrowerid;
