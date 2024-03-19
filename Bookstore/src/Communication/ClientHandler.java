@@ -1,9 +1,9 @@
 package Communication;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import BuisnessLogic.Authentication.Response;
+import BuisnessLogic.Controllers.APIController;
+
+import java.io.*;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable , ICommunicator {
@@ -24,21 +24,24 @@ public class ClientHandler implements Runnable , ICommunicator {
 
     @Override
     public void run() {
-        try {
-            //
-            String message = "";
-            while (!message.equals("end")) {
-                message = receiveMessage();
-                System.out
-                        .println("Message from client of port " + clientSocket.getPort() + ": ( " + message + " )");
+        APIController apiController = new APIController(this);
+        apiController.handleClientRequest();
 
-            }
-
-            clientSocket.close();
-            System.out.println("----> Connection closed for client of port " + clientSocket.getPort());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            //
+//            String message = "";
+//            while (!message.equals("end")) {
+//                message = receiveMessage();
+//                System.out
+//                        .println("Message from client of port " + clientSocket.getPort() + ": ( " + message + " )");
+//
+//            }
+//
+//            clientSocket.close();
+//            System.out.println("----> Connection closed for client of port " + clientSocket.getPort());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
     }
 
 
@@ -55,12 +58,27 @@ public class ClientHandler implements Runnable , ICommunicator {
     }
 
     @Override
-    public void sendMessage(String message) {
+    public void sendMessage(String  message) {
         try{
+
             outputStream.writeUTF(message);
+            outputStream.flush();
 
         }catch (Exception e){
             System.out.println("Error : could not send message properly to client at "+  clientSocket.getPort());
         }
+    }
+
+    @Override
+    public void sendResponse(Response response) {
+        try {
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(response);
+            objectOutputStream.flush();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("Could not send response : " + response);
+        }
+
     }
 }

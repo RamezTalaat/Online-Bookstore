@@ -1,5 +1,8 @@
 package Communication;
 
+
+import BuisnessLogic.Authentication.Response;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -12,9 +15,12 @@ public class ClientCommunicator implements ICommunicator {
     public ClientCommunicator(){
        try {
            connectToServer();
+           if(getServerSocket() == null || getServerSocket().isClosed()){
+               return;
+           }
            inputStream = new DataInputStream(new BufferedInputStream(server.getInputStream()));
            outputStream = new DataOutputStream(server.getOutputStream());
-           //DataOutputStream out = new DataOutputStream(server.getOutputStream());
+
        }catch (Exception e){
            e.printStackTrace();
            System.out.println("Error in connecting to server");
@@ -37,7 +43,7 @@ public class ClientCommunicator implements ICommunicator {
 
         }catch (Exception e){
             e.printStackTrace();
-            System.out.println("Error : Could not connect to server");
+            System.out.println("Error : Could not connect to server , please close the program and try again");
         }
     }
 
@@ -59,6 +65,20 @@ public class ClientCommunicator implements ICommunicator {
         } catch (Exception e) {
             //throw new RuntimeException(e);
             System.out.println("Error in reading from server ");
+        }
+        return null;
+    }
+
+    @Override
+    public Response receiveResponse() {
+        try {
+            ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+            Response response = new Response();
+            response = (Response) objectInputStream.readObject();
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error : Problem in receiving server response!");
         }
         return null;
     }

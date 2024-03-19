@@ -20,13 +20,10 @@ public class Main {
 //        ActiveDatabase db = ActiveDatabase.getInstance();
 //        db.printActiveDatabase();
 //        UUID uuid =  db.addUser(11);
-        BookController book = new BookController();
-        ArrayList<Book> res= book.searchForBook("genre","Sci-fi");
-        int i = 0;
-        while( i != res.size()){
-            System.out.println(res.get(i));
-            i++;
-        }
+
+//        BookController book = new BookController();
+//        book.removeBook(2);
+
 
         //Connection connection = Db.connectToDb();
        // Db.createTable(connection, "za3bola");
@@ -40,6 +37,6 @@ public class Main {
 //        authenticator.signOut(uuid);
 //        db.printActiveDatabase();
 
-//        ServerCommunicator serverCommunicator = new ServerCommunicator();
+        ServerCommunicator serverCommunicator = new ServerCommunicator();
     }
 }

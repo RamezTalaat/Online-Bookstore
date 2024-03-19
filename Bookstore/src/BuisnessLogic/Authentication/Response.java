@@ -1,6 +1,8 @@
 package BuisnessLogic.Authentication;
 
-public class Response<T> {
+import java.io.Serializable;
+
+public class Response<T> implements Serializable {
     public String message;
     public int status;
 
@@ -10,4 +12,5 @@ public class Response<T> {
     public String toString() {
         return "Response => status = " + status + " , message =  " + message + " , object = " + object;
     }
+
 }

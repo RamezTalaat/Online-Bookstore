@@ -7,5 +7,15 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="JarProject" level="project" />
+    <orderEntry type="module-library" exported="">
+      <library name="JarProject">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../JarProject/out/artifacts/JarProject_jar/JarProject.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
