@@ -25,20 +25,15 @@ public class APIController {
                     String password = communicator.receiveMessage();
                     IAuthenticator authenticator = new UUIDAuthenticator();
                     Response response = authenticator.signUp(name , userName , password);
-
+                    communicator.sendResponse(response);
                     break;
                 }
                 case "sign in":{
-                    System.out.println("in sign up");
+                    System.out.println("in sign in");
                     String userName = communicator.receiveMessage();
                     String password = communicator.receiveMessage();
                     IAuthenticator authenticator = new UUIDAuthenticator();
                     Response response = authenticator.signIn( userName , password);
-
-                    //resposne mapper
-
-                    System.out.println(response);
-
                     communicator.sendResponse(response);
                     break;
                 } case "sign out":{

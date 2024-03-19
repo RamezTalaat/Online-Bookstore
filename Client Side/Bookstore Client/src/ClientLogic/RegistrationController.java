@@ -20,7 +20,10 @@ public class RegistrationController {
             choice = printRegistrationMenu();
         }
         if(choice == 1){ //Sign Up scenario
-
+            communicator.sendMessage("sign up");
+            singUp();
+            Response response = communicator.receiveResponse();
+            System.out.println(response);
         }
         else if(choice == 2) { // Sign In scenario
             communicator.sendMessage("sign in");
@@ -36,9 +39,10 @@ public class RegistrationController {
     }
 
     public int printRegistrationMenu(){
-        System.out.println("Choose an option:");
+        System.out.println("User Registration: ");
         System.out.println("1. Sign up");
         System.out.println("2. Sign in");
+        System.out.print("Choose an option:  ");
         try {
             String choice = reader.readLine();
             if(choice.equals("1")){
@@ -63,6 +67,22 @@ public class RegistrationController {
             userName = reader.readLine();
             System.out.print("Enter you password: ");
             password = reader.readLine();
+            communicator.sendMessage(userName);
+            communicator.sendMessage(password);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void singUp(){
+        try {
+            String name, userName , password;
+            System.out.print("Enter you name: ");
+            name = reader.readLine();
+            System.out.print("Enter you user name: ");
+            userName = reader.readLine();
+            System.out.print("Enter you password: ");
+            password = reader.readLine();
+            communicator.sendMessage(name);
             communicator.sendMessage(userName);
             communicator.sendMessage(password);
         } catch (IOException e) {
