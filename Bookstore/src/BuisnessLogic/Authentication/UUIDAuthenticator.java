@@ -61,10 +61,10 @@ public class UUIDAuthenticator implements  IAuthenticator{
             System.out.println("user id = -1");
             return errorAddingUser();
         }
-        UUID uuid = addUserToActiveDb(result.get(0).id);
+        //UUID uuid = addUserToActiveDb(result.get(0).id);
         response.status = 200;
         response.message = "User added successfully";
-        response.object = uuid;
+        response.object = result.get(0);
         return response;
 
     }
@@ -103,10 +103,14 @@ public class UUIDAuthenticator implements  IAuthenticator{
         }
 
         //Step 2. add to Active DB
-        UUID uuid = addUserToActiveDb(result.get(0).id);
+        //UUID uuid = addUserToActiveDb(result.get(0).id);
         response.status = 200;
-        response.message = "User signed in successfully";
-        response.object = uuid;
+        if(result.get(0).role.equals("admin")){
+            response.message = "Admin signed in successfully";
+        }else{
+            response.message = "User signed in successfully";
+        }
+        response.object = result.get(0);
         return response;
     }
 

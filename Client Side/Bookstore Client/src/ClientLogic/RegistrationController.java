@@ -1,11 +1,13 @@
 package ClientLogic;
 
 import BuisnessLogic.Authentication.Response;
+import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.UUID;
 
 public class RegistrationController {
     private static ICommunicator communicator;
@@ -15,25 +17,39 @@ public class RegistrationController {
         reader = new BufferedReader(new InputStreamReader(System.in));
     }
     public void registerClient(){
-        int choice = -1 ;
+        int choice = -1 ; //Wrong input handling loop
         while (choice == -1){
             choice = printRegistrationMenu();
         }
+
+        Response response;
         if(choice == 1){ //Sign Up scenario
             communicator.sendMessage("sign up");
             singUp();
-            Response response = communicator.receiveResponse();
+            response = communicator.receiveResponse();
             System.out.println(response);
         }
         else if(choice == 2) { // Sign In scenario
             communicator.sendMessage("sign in");
             singIn();
-            Response response = communicator.receiveResponse();
+            response = communicator.receiveResponse();
             System.out.println(response);
         }
         else{
             System.out.println("Error : could not understand user input"); //Extra security
             return;
+        }
+        if(response.status == 200){
+            User user = (User)response.object;
+            if(response.message.equals("Admin signed in successfully")){//admin path
+                System.out.println("Welcome Admin!");
+                AdminController adminController = new AdminController(communicator ,user); // not implemented yet
+            }else{
+                System.out.println("User Signed In Successfully");
+                UserController userController = new UserController(communicator ,user);
+                userController.handleUser();
+            }
+
         }
 
     }
@@ -45,14 +61,17 @@ public class RegistrationController {
         System.out.print("Choose an option:  ");
         try {
             String choice = reader.readLine();
-            if(choice.equals("1")){
-                return 1;
-            }else if(choice.equals("2")){
-                return 2;
-            }else{
-                System.out.println("Error : please enter a valid input");
-                return -1;
+            switch (choice){
+                case "1":{
+                    return 1;
+                } case "2":{
+                    return 2;
+                } default:{
+                    System.out.println("Error : please enter a valid input");
+                    return -1;
+                }
             }
+
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Error : please enter a valid input");
@@ -89,4 +108,6 @@ public class RegistrationController {
             throw new RuntimeException(e);
         }
     }
+
+
 }

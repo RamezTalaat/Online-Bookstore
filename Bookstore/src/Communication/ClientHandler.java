@@ -1,7 +1,7 @@
 package Communication;
 
 import BuisnessLogic.Authentication.Response;
-import BuisnessLogic.Controllers.APIController;
+import BuisnessLogic.Controllers.RegistrationController;
 
 import java.io.*;
 import java.net.Socket;
@@ -24,24 +24,9 @@ public class ClientHandler implements Runnable , ICommunicator {
 
     @Override
     public void run() {
-        APIController apiController = new APIController(this);
-        apiController.handleClientRequest();
+        RegistrationController registrationController = new RegistrationController(this);
+        registrationController.handleClientRequest();
 
-//        try {
-//            //
-//            String message = "";
-//            while (!message.equals("end")) {
-//                message = receiveMessage();
-//                System.out
-//                        .println("Message from client of port " + clientSocket.getPort() + ": ( " + message + " )");
-//
-//            }
-//
-//            clientSocket.close();
-//            System.out.println("----> Connection closed for client of port " + clientSocket.getPort());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
     }
 
 
