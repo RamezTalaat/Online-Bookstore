@@ -79,6 +79,12 @@ public class BookController {
         return null;
     }
 
+    public ArrayList<Book> getUserBooks(int userid){
+        String query = "select * from books where ownerid = '" + userid + "' or borrowerid = '" + userid + "'";
+        ArrayList<Book> result ;
+        result = dbConnection.select(Book.class,query);
+        return result;
+    }
     public ArrayList<Book> browseBooks(){
         String query = "select * from books";
         ArrayList<Book> result ;

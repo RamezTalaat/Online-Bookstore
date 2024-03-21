@@ -24,9 +24,6 @@ public class UserController {
                     System.out.println("user in browse function");
                     BookController bookController = new BookController();
                     ArrayList<Book> result = bookController.browseBooks();
-                    for(int i = 0 ; i < result.size() ; i++){
-                        System.out.println(result.get(i));
-                    }
                     Response response = new Response();
                     if(result.isEmpty()){
                         response.status = 400;
@@ -57,6 +54,24 @@ public class UserController {
                         response.status = 400;
                         response.message = "could not submit borrow request!";
                     }
+                    communicator.sendResponse(response);
+                    break;
+                }
+                case "get user books":{
+                    System.out.println("user in browse function");
+                    BookController bookController = new BookController();
+                    ArrayList<Book> result = bookController.getUserBooks(currentUser.id);
+                    Response response = new Response();
+                    if(result.isEmpty()){
+                        response.status = 400;
+                        response.message = "No books to in your library yet";
+
+                    }else{
+                        response.status = 200;
+                        response.message = "books retrieved successfully";
+                        response.object = result;
+                    }
+                    System.out.println("get my books response = " + response);
                     communicator.sendResponse(response);
                     break;
                 }

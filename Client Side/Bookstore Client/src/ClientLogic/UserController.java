@@ -30,7 +30,7 @@ public class UserController {
                     break;
                 }
                 case 2:{
-
+                    getUserBooks();
                     break;
                 }
                 case 3:{
@@ -61,6 +61,20 @@ public class UserController {
 
     }
 
+    public ArrayList<Book> getUserBooks(){
+        communicator.sendMessage("get user books");
+        Response response = communicator.receiveResponse();
+        if(response.status != 200){
+            System.out.println("Looks like you have no personal books yet");
+            return null;
+        }else{
+            ArrayList<Book> books= (ArrayList<Book>)response.object;
+            for(int i = 0 ; i < books.size() ; i++){
+                System.out.println(i+1 + ") " + books.get(i));
+            }
+            return books;
+        }
+    }
     public void submitABorrowRequest(){
         // to get books to borrow
         ArrayList<Book> books =  browseBooks();
@@ -146,7 +160,8 @@ public class UserController {
 //            System.out.println("3. Check Incoming Borrow Requests");
 //            System.out.println("3. Check Borrow Requests History");
             System.out.println("1. Browse Books Library");
-            System.out.println("2. Search Books (ex. Search by title , author , genre)");
+            System.out.println("2. Get User Books");
+            //System.out.println("2. Search Books (ex. Search by title , author , genre)");
 
             System.out.println("4. Remove a book from your inventory");
             System.out.println("5. Check your requests history (ex. Accept/Reject incoming requests & Chat with borrower)");
