@@ -70,7 +70,7 @@ public class UserController {
         }
         int bookNumber = -1;
         String bookNumberString= "";
-        while (bookNumber > books.size() || bookNumber < 0){
+        while (bookNumber > books.size() || bookNumber < 1){
             System.out.print("Enter the book number you want to borrow (ex. 1): ");
             try {
                 bookNumberString =  reader.readLine();
@@ -80,11 +80,12 @@ public class UserController {
                 bookNumber = -1;
             }
         }
-        bookNumber--;
+
         System.out.println("book number = "+bookNumber);
         String choice = "";
         System.out.println("Are you sure you want to submit a borrow request for this book ? (yes or no)");
-        System.out.println(books.get(bookNumber));
+        int accessBookNumberIndex = bookNumber - 1;
+        System.out.println(books.get(accessBookNumberIndex));
         try{
             choice = reader.readLine();
             choice = choice.toLowerCase();
@@ -96,7 +97,7 @@ public class UserController {
                 return;
             }
             System.out.println(currentUser);
-            if (books.get(bookNumber).ownerid == currentUser.id){
+            if (books.get(accessBookNumberIndex).ownerid == currentUser.id){
                 System.out.println("You already are the owner of this book");
                 return;
             }
@@ -107,8 +108,8 @@ public class UserController {
         }
 
         communicator.sendMessage("borrow request");
-        communicator.sendMessage(currentUser.id); // convert to strings
-        communicator.sendMessage(bookNumber);
+        communicator.sendMessage(String.valueOf( currentUser.id)); // convert to strings
+        communicator.sendMessage(String.valueOf( bookNumber));
 
         Response response = new Response();
         response = communicator.receiveResponse();

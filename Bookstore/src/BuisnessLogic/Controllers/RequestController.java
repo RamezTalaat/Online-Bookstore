@@ -16,9 +16,10 @@ public class RequestController {
         if(books.size() != 1)
             return false;
         int lenderId = books.get(0).ownerid;
-        query = "insert into users (lenderid , borrowerid , bookid , status) values ('"
+        query = "insert into borrowrequests (lenderid , borrowerid , bookid , status) values ('"
                 + lenderId + "' , '" + userid + "' , '" +bookid + "' , 'pending')" ;//status = pending by default
 
+        System.out.println("request borrow query = " + query);
         return dbConnection.operate(query);
     }
 }
