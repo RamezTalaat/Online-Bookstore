@@ -140,9 +140,14 @@ public class UserController {
         int choice = -1 ;
         while (choice == -1 ){
             System.out.println("Services: ");
-            System.out.println("1. Browse Books");
+//            System.out.println("1. View Your Books Library");
+//            System.out.println("3. Add A Book To Your Library");
+//            System.out.println("3. Remove A Book From Your Library");
+//            System.out.println("3. Check Incoming Borrow Requests");
+//            System.out.println("3. Check Borrow Requests History");
+            System.out.println("1. Browse Books Library");
             System.out.println("2. Search Books (ex. Search by title , author , genre)");
-            System.out.println("3. Add a book to your inventory");
+
             System.out.println("4. Remove a book from your inventory");
             System.out.println("5. Check your requests history (ex. Accept/Reject incoming requests & Chat with borrower)");
             System.out.println("6. borrow a book (submit a borrow request)");

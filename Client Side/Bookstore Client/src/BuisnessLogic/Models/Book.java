@@ -11,6 +11,7 @@ public class Book implements Serializable {
     public String description;
     public String genre;
     public  int ownerid;
+    public  int borrowerid;
 
 //    @Override
 //    public String toString() {

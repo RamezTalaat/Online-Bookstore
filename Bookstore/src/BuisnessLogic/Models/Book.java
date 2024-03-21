@@ -11,11 +11,12 @@ public class Book implements Serializable {
     public String description;
     public String genre;
     public  int ownerid;
+    public  int borrowerid;
 
     @Override
     public String toString() {
         return "BOOK=> id = " + id + " , price = " + price + " $ , title = " + title +
                 " , author = " + author +" , genre = " + genre +  " , quantity = " + quantity
-                + " , description = " + description + " , ownerId = " + ownerid ;
+                + " , description = " + description + " , ownerId = " + ownerid  + " , borrowerid = " + borrowerid ;
     }
 }
