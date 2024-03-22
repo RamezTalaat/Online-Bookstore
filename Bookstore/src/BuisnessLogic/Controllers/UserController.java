@@ -2,6 +2,7 @@ package BuisnessLogic.Controllers;
 
 import BuisnessLogic.Authentication.Response;
 import BuisnessLogic.Models.Book;
+import BuisnessLogic.Models.BorrowRequest;
 import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
 
@@ -72,6 +73,43 @@ public class UserController {
                         response.object = result;
                     }
                     System.out.println("get my books response = " + response);
+                    communicator.sendResponse(response);
+                    break;
+                }
+                case "get book by id":{
+                    System.out.println("user in get book by id function");
+                    BookController bookController = new BookController();
+                    String stringBookId = communicator.receiveMessage();
+                    int bookId = Integer.parseInt(stringBookId);
+                    Book result = bookController.getBookById(bookId);
+                    Response response = new Response();
+                    if(result == null){
+                        response.status = 400;
+                        response.message = "No book with this id";
+
+                    }else{
+                        response.status = 200;
+                        response.message = "book retrieved successfully";
+                        response.object = result;
+                    }
+                    communicator.sendResponse(response);
+                    break;
+                }
+                case "get borrow request history":{
+                    System.out.println("user in get  borrow request history function");
+                    BookController bookController = new BookController();
+                    ArrayList<BorrowRequest> result = bookController.getBorrowRequestsHistory(currentUser.id);
+                    Response response = new Response();
+                    if(result.isEmpty()){
+                        response.status = 400;
+                        response.message = "No request history yet";
+
+                    }else{
+                        response.status = 200;
+                        response.message = "requests history retrieved successfully";
+                        response.object = result;
+                    }
+                    System.out.println("borrow requests history response = " + response);
                     communicator.sendResponse(response);
                     break;
                 }

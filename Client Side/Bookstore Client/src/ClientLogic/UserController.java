@@ -2,6 +2,7 @@ package ClientLogic;
 
 import BuisnessLogic.Authentication.Response;
 import BuisnessLogic.Models.Book;
+import BuisnessLogic.Models.BorrowRequest;
 import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
 
@@ -26,11 +27,11 @@ public class UserController {
         while (choice != 7){//sign out choice
             switch (choice){
                 case 1:{
-                    browseBooks();
+                    getUserBooks();
                     break;
                 }
                 case 2:{
-                    getUserBooks();
+
                     break;
                 }
                 case 3:{
@@ -40,13 +41,18 @@ public class UserController {
                     break;
                 }
                 case 5:{
+                    checkBorrowRequestHistory();
                     break;
                 }
                 case 6:{
-                    submitABorrowRequest();
+                    browseBooks();
                     break;
                 }
                 case 7:{
+                    break;
+                }
+                case 8:{
+                    submitABorrowRequest();
                     break;
                 }
                 default:{
@@ -61,6 +67,35 @@ public class UserController {
 
     }
 
+    public ArrayList<BorrowRequest> checkBorrowRequestHistory(){
+        communicator.sendMessage("get borrow request history");
+        Response response = communicator.receiveResponse();
+        if(response.status != 200){
+            System.out.println("Looks like you have no borrow requests history yet");
+            return null;
+        }else{
+            ArrayList<BorrowRequest> requests= (ArrayList<BorrowRequest>)response.object;
+            for(int i = 0 ; i < requests.size() ; i++){
+                System.out.println(i+1 + ") " + requests.get(i));
+                Book book = getBookById(requests.get(i).bookid);
+                System.out.println(book);
+            }
+            return requests;
+        }
+    }
+    public Book getBookById(int bookId){
+        communicator.sendMessage("get book by id");
+        String stringBookId = String.valueOf(bookId);
+        communicator.sendMessage(stringBookId);
+        Response response = communicator.receiveResponse();
+        if(response.status != 200){
+            System.out.println(response.message);
+            return null;
+        }else{
+            Book book= (Book)response.object;
+            return book;
+        }
+    }
     public ArrayList<Book> getUserBooks(){
         communicator.sendMessage("get user books");
         Response response = communicator.receiveResponse();
@@ -154,19 +189,15 @@ public class UserController {
         int choice = -1 ;
         while (choice == -1 ){
             System.out.println("Services: ");
-//            System.out.println("1. View Your Books Library");
-//            System.out.println("3. Add A Book To Your Library");
-//            System.out.println("3. Remove A Book From Your Library");
-//            System.out.println("3. Check Incoming Borrow Requests");
-//            System.out.println("3. Check Borrow Requests History");
-            System.out.println("1. Browse Books Library");
-            System.out.println("2. Get User Books");
-            //System.out.println("2. Search Books (ex. Search by title , author , genre)");
-
-            System.out.println("4. Remove a book from your inventory");
-            System.out.println("5. Check your requests history (ex. Accept/Reject incoming requests & Chat with borrower)");
-            System.out.println("6. borrow a book (submit a borrow request)");
-            System.out.println("7. Sign Out");
+            System.out.println("1. View Your Books Library");
+            System.out.println("2. Add A Book To Your Library");
+            System.out.println("3. Remove A Book From Your Library");
+            System.out.println("4. Check Incoming Borrow Requests (ex. Accept/Reject incoming requests & Chat with borrower)");
+            System.out.println("5. Check Borrow Your Requests History");
+            System.out.println("6. Browse Books Library");
+            System.out.println("7. Search Books (ex. Search by title , author , genre)");
+            System.out.println("8. Borrow A Book (submit a borrow request)");
+            System.out.println("9. Sign Out");
             System.out.print("Choose an option:  ");
             try {
                 String userChoice = reader.readLine();

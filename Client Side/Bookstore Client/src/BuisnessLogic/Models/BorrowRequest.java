@@ -12,6 +12,6 @@ public class BorrowRequest implements Serializable {
     @Override
     public String toString() {
         return "BORROWREQUEST=> id = " + id + " , lenderid = " + lenderid + " , borrowerid = " + borrowerid +
-                " , bookid = " + bookid + " , comment = " + status;
+                " , bookid = " + bookid + " , status = " + status;
     }
 }

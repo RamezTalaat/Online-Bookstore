@@ -2,6 +2,7 @@ package BuisnessLogic.Controllers;
 
 import BuisnessLogic.Authentication.Response;
 import BuisnessLogic.Models.Book;
+import BuisnessLogic.Models.BorrowRequest;
 import DbContext.DbConnection;
 
 import java.util.ArrayList;
@@ -79,11 +80,26 @@ public class BookController {
         return null;
     }
 
+    public ArrayList<BorrowRequest> getBorrowRequestsHistory(int userid){
+        String query = "select * from borrowrequests where borrowerid = '" + userid + "'";
+        ArrayList<BorrowRequest> result ;
+        result = dbConnection.select(BorrowRequest.class,query);
+        return result;
+    }
+
     public ArrayList<Book> getUserBooks(int userid){
         String query = "select * from books where ownerid = '" + userid + "' or borrowerid = '" + userid + "'";
         ArrayList<Book> result ;
         result = dbConnection.select(Book.class,query);
         return result;
+    }
+    public Book getBookById(int bookid){
+        String query = "select * from books where id = '" + bookid + "'";
+        ArrayList<Book> result ;
+        result = dbConnection.select(Book.class,query);
+        if(result == null || result.isEmpty())
+            return null;
+        return result.get(0);
     }
     public ArrayList<Book> browseBooks(){
         String query = "select * from books";
