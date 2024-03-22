@@ -135,6 +135,25 @@ public class UserController {
                     communicator.sendResponse(response);
                     break;
                 }
+                case "Search":{
+                    System.out.println("You are in the search mode");
+                    String str = communicator.receiveMessage();
+                    String value = communicator.receiveMessage();
+                    BookController bookController = new BookController();
+                    Response response = new Response();
+                    ArrayList<Book> listOfBooks = bookController.searchForBook(str,value);
+                    if(!listOfBooks.isEmpty()){
+                        response.status = 200;
+                        response.message ="list of books returned";
+                        response.object=listOfBooks;
+                    }else{
+                        response.status=400;
+                        response.message="there is no books with this "+str;
+                    }
+                    System.out.println("the returned value is "+response);
+                    communicator.sendResponse(response);
+                    break;
+                }
                 case "sign out":{
                     System.out.println("User Signing out");
                     return;

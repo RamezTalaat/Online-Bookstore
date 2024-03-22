@@ -13,7 +13,6 @@ public class BookController {
         dbConnection= new DbConnection();
     }
     public boolean removeBook(int bookID){
-        Response response = new Response();
         String query = "select * from books where id ="+bookID;
         DbConnection dbConnection = new DbConnection();
 
@@ -24,9 +23,6 @@ public class BookController {
             int numOfBooks = result.get(0).quantity ;
             query = "update books set quantity ="+(numOfBooks - 1)+" where id ="+bookID;
             res = dbConnection.operate(query);
-            response.status=200;
-            response.message="The book has been removed from the books and the number of books now: "+result.get(0).quantity;
-            System.out.println(response);
             return res;
         }
         String sql = "Delete from books where id ="+bookID;
@@ -39,7 +35,7 @@ public class BookController {
         return false;
     }
     public ArrayList<Book> searchForBook(String str, String value){
-        Response response = new Response();
+
         ArrayList<Book> result;
         String query;
         switch(str){
@@ -47,8 +43,6 @@ public class BookController {
                 query = "select * from books where title ='"+value+"'";
                 result = dbConnection.select(Book.class, query);
                 if(!result.isEmpty()){
-                    response.status=200;
-                    response.message="list returned Successfully";
                     return result;
                 }
                 System.out.println("There is no books with this "+str);
@@ -57,8 +51,7 @@ public class BookController {
                 query = "select * from books where author ='"+value+"'";
                 result = dbConnection.select(Book.class, query);
                 if(!result.isEmpty()){
-                    response.status=200;
-                    response.message="list returned Successfully";
+
                     return result;
                 }
                 System.out.println("There is no books with this "+str);
@@ -67,8 +60,6 @@ public class BookController {
                 query = "select * from books where genre ='"+value+"'";
                 result = dbConnection.select(Book.class, query);
                 if(!result.isEmpty()){
-                    response.status=200;
-                    response.message="list returned Successfully";
                     return result;
                 }
                 System.out.println("There is no books with this "+str);
