@@ -79,8 +79,14 @@ public class UserController {
                 //System.out.println(i+1 + ") " + requests.get(i));
                 Book book = getBookById(requests.get(i).bookid);
                 System.out.println("Request on : " + book);
-                User lender = getUserById(requests.get(i).lenderid);
-                System.out.println("Book lender : " + lender.name);
+                int lenderId = requests.get(i).lenderid;
+                if(lenderId == currentUser.id){
+                    System.out.println("Book lender : " + currentUser.name + " (You ;)");
+                }
+                else{
+                    User lender = getUserById(lenderId);
+                    System.out.println("Book lender : " + lender.name);
+                }
                 System.out.println("Request Status : " + requests.get(i).status);
                 System.out.println("-------------------------------------------------");
             }

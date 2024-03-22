@@ -81,7 +81,7 @@ public class BookController {
     }
 
     public ArrayList<BorrowRequest> getBorrowRequestsHistory(int userid){
-        String query = "select * from borrowrequests where borrowerid = '" + userid + "'";
+        String query = "select * from borrowrequests where borrowerid = '" + userid + "' or lenderid = '" + userid +"'";
         ArrayList<BorrowRequest> result ;
         result = dbConnection.select(BorrowRequest.class,query);
         return result;
