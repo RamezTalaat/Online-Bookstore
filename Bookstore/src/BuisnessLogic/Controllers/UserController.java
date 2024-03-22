@@ -5,6 +5,7 @@ import BuisnessLogic.Models.Book;
 import BuisnessLogic.Models.BorrowRequest;
 import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
+import DbContext.DbConnection;
 
 import java.util.ArrayList;
 
@@ -76,6 +77,27 @@ public class UserController {
                     communicator.sendResponse(response);
                     break;
                 }
+                case "get user by id":{
+                    System.out.println("user in get user by id function");
+                    String stringUserId = communicator.receiveMessage();
+                    int userid = Integer.parseInt(stringUserId);
+
+                    String query = "select * from users where id = '" + userid + "'";
+                    DbConnection dbConnection = new DbConnection();
+                    ArrayList<User> result  = dbConnection.select(User.class , query);
+                    Response response = new Response();
+                    if(result == null || result.isEmpty()){
+                        response.status = 400;
+                        response.message = "No user with this id";
+
+                    }else{
+                        response.status = 200;
+                        response.message = "user retrieved successfully";
+                        response.object = result.get(0); //to return user object not wrapped in list
+                    }
+                    communicator.sendResponse(response);
+                    break;
+                }
                 case "get book by id":{
                     System.out.println("user in get book by id function");
                     BookController bookController = new BookController();
@@ -127,4 +149,6 @@ public class UserController {
         }
         //Sign out code , close current socket connection
     }
+
+
 }

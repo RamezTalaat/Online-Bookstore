@@ -76,9 +76,13 @@ public class UserController {
         }else{
             ArrayList<BorrowRequest> requests= (ArrayList<BorrowRequest>)response.object;
             for(int i = 0 ; i < requests.size() ; i++){
-                System.out.println(i+1 + ") " + requests.get(i));
+                //System.out.println(i+1 + ") " + requests.get(i));
                 Book book = getBookById(requests.get(i).bookid);
-                System.out.println(book);
+                System.out.println("Request on : " + book);
+                User lender = getUserById(requests.get(i).lenderid);
+                System.out.println("Book lender : " + lender.name);
+                System.out.println("Request Status : " + requests.get(i).status);
+                System.out.println("-------------------------------------------------");
             }
             return requests;
         }
@@ -94,6 +98,19 @@ public class UserController {
         }else{
             Book book= (Book)response.object;
             return book;
+        }
+    }
+    public User getUserById(int userid){
+        communicator.sendMessage("get user by id");
+        String stringUserId = String.valueOf(userid);
+        communicator.sendMessage(stringUserId);
+        Response response = communicator.receiveResponse();
+        if(response.status != 200){
+            System.out.println(response.message);
+            return null;
+        }else{
+            User user= (User)response.object;
+            return user;
         }
     }
     public ArrayList<Book> getUserBooks(){

@@ -93,8 +93,8 @@ public class BookController {
         result = dbConnection.select(Book.class,query);
         return result;
     }
-    public Book getBookById(int bookid){
-        String query = "select * from books where id = '" + bookid + "'";
+    public Book getBookById(int bookId){
+        String query = "select * from books where id = '" + bookId + "'";
         ArrayList<Book> result ;
         result = dbConnection.select(Book.class,query);
         if(result == null || result.isEmpty())
