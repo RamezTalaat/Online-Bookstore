@@ -249,7 +249,7 @@ public class UserController {
                         return result;
                     }
                 } else if (num == 2) {
-                    communicator.sendMessage("auther");
+                    communicator.sendMessage("author");
                     Response response = new Response<>();
                     System.out.print("Please Enter the Auther Name:");
                     value = reader.readLine();
