@@ -26,6 +26,11 @@ public class ClientHandler implements Runnable , ICommunicator {
     public void run() {
         RegistrationController registrationController = new RegistrationController(this);
         registrationController.handleClientRequest();
+        try {
+            clientSocket.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

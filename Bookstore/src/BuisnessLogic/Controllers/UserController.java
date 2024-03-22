@@ -137,7 +137,8 @@ public class UserController {
                 }
                 case "sign out":{
                     System.out.println("User Signing out");
-                    break;
+                    return;
+                    //break;
                 }default:{
                     Response response  = new Response();
                     response.status = 400;

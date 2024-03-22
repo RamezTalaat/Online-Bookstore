@@ -54,6 +54,10 @@ public class UserController {
                 case 8:{
                     submitABorrowRequest();
                     break;
+                }case 9:{
+                    communicator.sendMessage("sign out");
+                    System.out.println("Good Bye!");
+                    return;
                 }
                 default:{
                     System.out.println("Good Bye!");
@@ -227,7 +231,7 @@ public class UserController {
 
                 int choiceNumber = Integer.parseInt(userChoice);
                 System.out.println("Choice number = " + choiceNumber);
-                if(choiceNumber >=1 && choiceNumber <= 7){
+                if(choiceNumber >=1 && choiceNumber <= 9){
                     choice = choiceNumber;
                     return choiceNumber;
                 }

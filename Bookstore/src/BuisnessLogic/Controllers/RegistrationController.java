@@ -49,8 +49,9 @@ public class RegistrationController {
                             userController.handleUser();
                         }
                     }
-
+                    userChoice = "end";
                     //communicator.sendResponse(response);
+                    //return;
                     break;
                 } case "sign out":{
 //                    System.out.println("in sign out");
