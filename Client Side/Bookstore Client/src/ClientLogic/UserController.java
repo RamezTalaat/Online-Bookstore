@@ -50,6 +50,7 @@ public class UserController {
                     break;
                 }
                 case 7: {
+                    Search();
                     break;
                 }
                 case 8: {
@@ -216,7 +217,82 @@ public class UserController {
 
     }
 
-    
+    public ArrayList<Book> Search() {
+        communicator.sendMessage("Search");
+        String msg = "";
+        String value = "";
+        int num = 0;
+        try {
+            while (num != 4) {
+                System.out.println("1.title");
+                System.out.println("2.auther");
+                System.out.println("3.genre");
+                System.out.println("4.exit");
+                System.out.print("Please enter number:");
+                msg = reader.readLine();
+                num = Integer.parseInt(msg);
+                if (num == 1) {
+                    Response response = new Response<>();
+                    communicator.sendMessage("title");
+                    System.out.print("Please Enter the title:");
+                    value = reader.readLine();
+                    communicator.sendMessage(value);
+                    response = communicator.receiveResponse();
+                    if (response.status != 200) {
+                        System.out.println("Looks like there is no book with this title");
+                        return null;
+                    } else {
+                        ArrayList<Book> result = (ArrayList<Book>) response.object;
+                        for (Book s : result) {
+                            System.out.println(s);
+                        }
+                        return result;
+                    }
+                } else if (num == 2) {
+                    communicator.sendMessage("auther");
+                    Response response = new Response<>();
+                    System.out.print("Please Enter the Auther Name:");
+                    value = reader.readLine();
+                    communicator.sendMessage(value);
+                    response = communicator.receiveResponse();
+                    if (response.status != 200) {
+                        System.out.println("Looks like there is no books with this Auther Name");
+                        return null;
+                    } else {
+                        ArrayList<Book> result = (ArrayList<Book>) response.object;
+                        for (Book s : result) {
+                            System.out.println(s);
+                        }
+                        return result;
+                    }
+                } else if (num == 3) {
+                    communicator.sendMessage("genre");
+                    Response response = new Response<>();
+                    System.out.print("Please Enter the genre:");
+                    value = reader.readLine();
+                    communicator.sendMessage(value);
+                    response = communicator.receiveResponse();
+                    if (response.status != 200) {
+                        System.out.println("Looks like there is no books with this Genre");
+                        return null;
+                    } else {
+                        ArrayList<Book> result = (ArrayList<Book>) response.object;
+                        for (Book s : result) {
+                            System.out.println(s);
+                        }
+                        return result;
+                    }
+                } else {
+                    System.out.println("Please Enter valid input");
+                }
+
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return null;
+    }
+
     public int getUserChoice() {
         int choice = -1;
         while (choice == -1) {
