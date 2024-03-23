@@ -24,8 +24,14 @@ public class UserController {
         reader = new BufferedReader(new InputStreamReader(System.in));
     }
 
+
     public void handleUser() {
-        int choice = getUserChoice();
+        ArrayList<String > optionsArray = new ArrayList<>(Arrays.asList("View Your Books Library" ,
+                "Add A Book To Your Library" , "Remove A Book From Your Library" ,
+                "Check Incoming Borrow Requests (ex. Accept/Reject incoming requests & Chat with borrower)" ,
+                "Check Borrow Your Requests History" , "Browse Books Library" , "Search Books (ex. Search by title , author , genre)",
+                "Borrow A Book (submit a borrow request)" , "Sign Out"));
+        int choice = inputUserChoice(String.class , optionsArray);
         while (choice != 10) {// sign out choice
             switch (choice) {
                 case 1: {
@@ -76,7 +82,7 @@ public class UserController {
                 }
 
             }
-            choice = getUserChoice();
+            choice = inputUserChoice(String.class , optionsArray);
         }
 
     }
@@ -124,7 +130,7 @@ public class UserController {
         }
 
     }
-    
+
     public<T> int inputUserChoice( Class<T> tClass ,ArrayList<T> choices  ){ //tclass to get input for borrow requests
         int choice = -1;
         while (choice == -1){
@@ -142,7 +148,7 @@ public class UserController {
                         System.out.println(i+1 + ". "+ choices.get(i));
                     }
                 }
-
+                System.out.print("Choose a number: ");
                 String input = reader.readLine();
                 choice = Integer.parseInt(input);
             } catch (Exception e) {
@@ -383,40 +389,4 @@ public class UserController {
         }
         return null;
     }
-
-    public int getUserChoice() {
-        int choice = -1;
-        while (choice == -1) {
-            System.out.println("Services: ");
-            System.out.println("1. View Your Books Library");
-            System.out.println("2. Add A Book To Your Library");
-            System.out.println("3. Remove A Book From Your Library");
-            System.out.println("4. Check Incoming Borrow Requests (ex. Accept/Reject incoming requests & Chat with borrower)");
-            System.out.println("5. Check Borrow Your Requests History");
-            System.out.println("6. Browse Books Library");
-            System.out.println("7. Search Books (ex. Search by title , author , genre)");
-            System.out.println("8. Borrow A Book (submit a borrow request)");
-            System.out.println("9. Sign Out");
-            System.out.print("Choose an option:  ");
-            try {
-                String userChoice = reader.readLine();
-
-                int choiceNumber = Integer.parseInt(userChoice);
-                System.out.println("Choice number = " + choiceNumber);
-                if (choiceNumber >= 1 && choiceNumber <= 9) {
-                    choice = choiceNumber;
-                    return choiceNumber;
-                }
-                System.out.println("Error : please enter a valid input");
-                // return -1;
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("Error : please enter a valid input");
-            }
-            // return -1;
-        }
-        return choice;
-    }
-
 }
