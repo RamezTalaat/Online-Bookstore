@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 import java.util.UUID;
 
 public class UserController {
@@ -30,9 +31,9 @@ public class UserController {
                 "Add A Book To Your Library" , "Remove A Book From Your Library" ,
                 "Check Incoming Borrow Requests (ex. Accept/Reject incoming requests & Chat with borrower)" ,
                 "Check Borrow Your Requests History" , "Browse Books Library" , "Search Books (ex. Search by title , author , genre)",
-                "Borrow A Book (submit a borrow request)" , "Sign Out"));
+                "Borrow A Book (submit a borrow request)", "Add a review using Book ID" , "Sign Out"));
         int choice = inputUserChoice(String.class , optionsArray);
-        while (choice != 10) {// sign out choice
+        while (choice != 44) {// sign out choice
             switch (choice) {
                 case 1: {
                     getUserBooks();
@@ -71,7 +72,12 @@ public class UserController {
                     submitABorrowRequest();
                     break;
                 }
-                case 9: {
+                case 9:
+                {
+                    addReview();
+                    break;
+                }
+                case 10: {
                     communicator.sendMessage("sign out");
                     System.out.println("Good Bye!");
                     return;
@@ -239,6 +245,114 @@ public class UserController {
         }
     }
 
+    public void addReview()
+    {
+        String StringBookId, StringRate, comment=null;
+        int bookID=-1;
+        int bookRate=-1;
+        System.out.println("Enter bookID");
+        while (bookID < 0) {
+            System.out.print("Enter the id of the book you want to review: ");
+            try {
+                StringBookId = reader.readLine();
+                bookID = Integer.parseInt(StringBookId);
+                if(bookID <= 0)
+                    throw new Exception("Sorry , please re-enter a valid book id");
+            } catch (Exception e) {
+                System.out.println("Sorry , please re-enter a valid book id");
+                bookID = -1;
+            }
+        }
+        while (bookRate < 0) {
+            System.out.print("Enter the rating of the book you want to add to review (ex. 0~10): ");
+            try {
+                StringRate = reader.readLine();
+                bookRate = Integer.parseInt(StringRate);
+                if(bookRate<=-1 || bookRate>=11)
+                    throw new Exception("Sorry , please re-enter a valid review");
+            } catch (Exception e) {
+                System.out.println("Sorry , please re-enter a valid review");
+                bookRate = -1;
+            }
+        }
+        System.out.println("Enter a comment!");
+        Scanner x = new Scanner(System.in);
+        comment = x.nextLine();
+        communicator.sendMessage("add review");
+        communicator.sendMessage(String.valueOf(currentUser.id));
+        communicator.sendMessage(String.valueOf(bookID));
+        communicator.sendMessage(String.valueOf(bookRate));
+        communicator.sendMessage(comment);
+        Response response = new Response();
+        response = communicator.receiveResponse();
+        if (response.status != 200) {
+            System.out.println("Sorry, the review was not added, try again");
+        } else {
+            System.out.println("Congrats, you review has been added successfully");
+        }
+    }
+    public void addBook()
+    {
+        String StringPrice, StringQuantity, title = null, author = null, description = null, genre = null;
+        int bookQuantity =-1;
+        double bookPrice =-1;
+        System.out.println("Enter book price");
+        while (bookPrice < 0) {
+            System.out.print("Enter the book price you want to add to your library (ex. 15.0): ");
+            try {
+                StringPrice = reader.readLine();
+                bookPrice = Double.parseDouble(StringPrice);
+                if(bookPrice<0)
+                    throw new Exception("Sorry , please re-enter a valid price");
+            } catch (Exception e) {
+                System.out.println("Sorry , please re-enter a valid price");
+                bookPrice = -1;
+            }
+        }
+        while (bookQuantity < 0) {
+            System.out.print("Enter the quantity of the book you want to add to your library (ex. 5): ");
+            try {
+                StringQuantity = reader.readLine();
+                bookQuantity = Integer.parseInt(StringQuantity);
+                if(bookQuantity<0)
+                    throw new Exception("Sorry , please re-enter a valid quantity");
+            } catch (Exception e) {
+                System.out.println("Sorry , please re-enter a valid book quantity");
+                bookQuantity = -1;
+            }
+        }
+        while(title == null || author == null || genre == null) {
+            try {
+                System.out.println("Please entre the book title");
+                title = reader.readLine();
+                System.out.println("Please entre the book genre");
+                genre = reader.readLine();
+                System.out.println("Please entre the book author");
+                author = reader.readLine();
+                System.out.println("Please entre the book description");
+                description = reader.readLine();
+                if(title == null || author == null || genre == null)
+                    throw new Exception("Sorry , please re-enter a valid book information.");
+            } catch (Exception e) {
+                System.out.println("Sorry , please re-enter a valid book information.");
+            }
+        }
+        communicator.sendMessage("add book");
+        communicator.sendMessage(String.valueOf(bookPrice));
+        communicator.sendMessage(genre);
+        communicator.sendMessage(title);
+        communicator.sendMessage(author);
+        communicator.sendMessage(description);
+        communicator.sendMessage(String.valueOf(bookQuantity));
+        communicator.sendMessage(String.valueOf(currentUser.id));
+        Response response = new Response();
+        response = communicator.receiveResponse();
+        if (response.status != 200) {
+            System.out.println("Sorry, the book was not added, try again");
+        } else {
+            System.out.println("Congrats, you book has been added successfully");
+        }
+    }
     public void submitABorrowRequest() {
         // to get books to borrow
         ArrayList<Book> books = browseBooks();
