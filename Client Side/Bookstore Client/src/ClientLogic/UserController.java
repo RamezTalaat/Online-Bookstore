@@ -7,12 +7,10 @@ import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
-import java.util.UUID;
 
 public class UserController {
     private final User currentUser;
@@ -137,9 +135,11 @@ public class UserController {
         else{
             //reject request in server side
             communicator.sendMessage("reject");
+
         }
         communicator.sendMessage(String.valueOf(pendingRequests.get(requestNumber).id));
-
+        Response response = communicator.receiveResponse();
+        System.out.println(response.message);
     }
 
     public<T> int inputUserChoice( Class<T> tClass ,ArrayList<T> choices  ){ //tclass to get input for borrow requests
@@ -183,8 +183,7 @@ public class UserController {
             System.out.println("Looks like you have no borrow requests history yet");
             return null;
         } else {
-            ArrayList<BorrowRequest> requests = (ArrayList<BorrowRequest>) response.object;
-            return requests;
+            return (ArrayList<BorrowRequest>) response.object;
         }
     }
 

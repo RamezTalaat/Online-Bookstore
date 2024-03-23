@@ -40,7 +40,13 @@ public class UserController {
                         requestController.acceptBorrowRequest(requestId);
                     }
                     else if (operation.equals("reject")){ //reject request
-                        requestController.rejectBorrowRequest(requestId);
+                        Boolean check = requestController.rejectBorrowRequest(requestId);
+                        if(check){
+                            returnSuccessResponse("Request was rejected successfully");
+                        }
+                        else{
+                            returnFailureResponse("Could not reject request properly");
+                        }
                     }
                     else{
                         System.out.println("problem in borrow request handling parsing");
@@ -250,6 +256,12 @@ public class UserController {
     public void returnFailureResponse(String message){
         Response response = new Response();
         response.status = 400;
+        response.message = message;
+        communicator.sendResponse(response);
+    }
+    public void returnSuccessResponse(String message){
+        Response response = new Response();
+        response.status = 200;
         response.message = message;
         communicator.sendResponse(response);
     }
