@@ -22,6 +22,33 @@ public class UserController {
         while (true){
             choice = communicator.receiveMessage();
             switch (choice){
+                case "handle borrow request":{
+                    String operation = communicator.receiveMessage(); //accept or reject
+                    String stringRequestId = communicator.receiveMessage();
+                    Response response = new Response();
+                    int requestId = -1;
+                    try {
+                        requestId = Integer.parseInt(stringRequestId);
+
+                    }catch (Exception e){
+                        System.out.println("Could not parse request id");
+                        returnFailureResponse("Could not parse request id");
+                    }
+
+                    RequestController requestController = new RequestController();
+                    if(operation.equals("accept")){
+                        requestController.acceptBorrowRequest(requestId);
+                    }
+                    else if (operation.equals("reject")){ //reject request
+                        requestController.rejectBorrowRequest(requestId);
+                    }
+                    else{
+                        System.out.println("problem in borrow request handling parsing");
+                        returnFailureResponse("problem in borrow request handling parsing");
+                        continue;
+                    }
+
+                }
                 case "browse":{
                     System.out.println("user in browse function");
                     BookController bookController = new BookController();
@@ -220,5 +247,11 @@ public class UserController {
         //Sign out code , close current socket connection
     }
 
+    public void returnFailureResponse(String message){
+        Response response = new Response();
+        response.status = 400;
+        response.message = message;
+        communicator.sendResponse(response);
+    }
 
 }

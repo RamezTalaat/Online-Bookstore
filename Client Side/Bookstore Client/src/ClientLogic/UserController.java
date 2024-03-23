@@ -124,16 +124,21 @@ public class UserController {
         choice = inputUserChoice( BorrowRequest.class, pendingRequests);
         System.out.print("You chose request =>" );
         printBorrowRequest(pendingRequests.get(choice-1));
-
+        int requestNumber = choice-1;
         optionsArray = new ArrayList<>(Arrays.asList("Accept" , "Reject"));
         choice = inputUserChoice(String.class , optionsArray);
+
+        communicator.sendMessage("handle borrow request");
         if(choice == 1){
             //accept request in server side
+            communicator.sendMessage("accept");
 
         }
         else{
             //reject request in server side
+            communicator.sendMessage("reject");
         }
+        communicator.sendMessage(String.valueOf(pendingRequests.get(requestNumber).id));
 
     }
 
@@ -142,8 +147,8 @@ public class UserController {
         while (choice == -1){
             try {
                 System.out.println("Choose an option:");
-                T object = tClass.getDeclaredConstructor().newInstance();
-                if(object == BorrowRequest.class){
+                if(tClass == BorrowRequest.class){
+                    System.out.println("Heeeeeeeeeeeeeere");
                     for (int i = 0 ; i < choices.size() ; i++){
                         BorrowRequest request = (BorrowRequest) choices.get(i);
                         System.out.print (i+1 + ". " );
@@ -179,10 +184,6 @@ public class UserController {
             return null;
         } else {
             ArrayList<BorrowRequest> requests = (ArrayList<BorrowRequest>) response.object;
-//            for (int i = 0; i < requests.size(); i++) {
-//                System.out.print(i+1 + ") ");
-//                printBorrowRequest(requests.get(i));
-//            }
             return requests;
         }
     }

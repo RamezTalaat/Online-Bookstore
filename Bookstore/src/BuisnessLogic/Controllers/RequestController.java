@@ -22,4 +22,14 @@ public class RequestController {
         System.out.println("request borrow query = " + query);
         return dbConnection.operate(query);
     }
+
+    public boolean acceptBorrowRequest(int requestId){
+
+
+        return false;
+    }
+    public boolean rejectBorrowRequest(int requestId){
+        String query = "update borrowrequests set status='rejected' where id='" + requestId+"'";
+        return dbConnection.operate(query);
+    }
 }
