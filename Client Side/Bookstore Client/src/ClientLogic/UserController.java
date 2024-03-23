@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class UserController {
@@ -25,7 +26,7 @@ public class UserController {
 
     public void handleUser() {
         int choice = getUserChoice();
-        while (choice != 9) {// sign out choice
+        while (choice != 10) {// sign out choice
             switch (choice) {
                 case 1: {
                     getUserBooks();
@@ -39,10 +40,17 @@ public class UserController {
                     break;
                 }
                 case 4: {
+                    checkRequestsInbox();
                     break;
                 }
                 case 5: {
-                    checkBorrowRequestHistory();
+                    var requests = getBorrowRequestHistory();
+                    if(requests != null || ! requests.isEmpty()){
+                        for (int i = 0 ; i < requests.size() ; i++){
+                            System.out.print(i+1 + ") ");
+                            printBorrowRequest(requests.get(i));
+                        }
+                    }
                     break;
                 }
                 case 6: {
@@ -73,7 +81,85 @@ public class UserController {
 
     }
 
-    public ArrayList<BorrowRequest> checkBorrowRequestHistory() {
+    public void checkRequestsInbox(){
+        //get pending requests
+        ArrayList<BorrowRequest> requests = getBorrowRequestHistory();
+        if(requests == null || requests.isEmpty()){
+            System.out.println("No pending requests");
+            return;
+        }
+        ArrayList<BorrowRequest> pendingRequests = new ArrayList<BorrowRequest>();
+        for (int i = 0 ; i < requests.size() ; i++){
+            if(requests.get(i).lenderid == currentUser.id){
+                pendingRequests.add(requests.get(i));
+            }
+        }
+        if(pendingRequests.isEmpty()){
+            System.out.println("No pending requests");
+            return;
+        }
+        for (int i = 0 ; i < pendingRequests.size() ; i++){
+            System.out.print(i+1 + ") ");
+            printBorrowRequest(pendingRequests.get(i));
+        }
+
+        ArrayList<String > optionsArray = new ArrayList<>(Arrays.asList("Accept / Reject a request" , "Go back to menu"));
+        int choice = inputUserChoice( String.class, optionsArray);
+
+        if(choice == 2) //go back to menu
+            return;
+
+        choice = inputUserChoice( BorrowRequest.class, pendingRequests);
+        System.out.print("You chose request =>" );
+        printBorrowRequest(pendingRequests.get(choice-1));
+
+        optionsArray = new ArrayList<>(Arrays.asList("Accept" , "Reject"));
+        choice = inputUserChoice(String.class , optionsArray);
+        if(choice == 1){
+            //accept request in server side
+
+        }
+        else{
+            //reject request in server side
+        }
+
+    }
+    
+    public<T> int inputUserChoice( Class<T> tClass ,ArrayList<T> choices  ){ //tclass to get input for borrow requests
+        int choice = -1;
+        while (choice == -1){
+            try {
+                System.out.println("Choose an option:");
+                T object = tClass.getDeclaredConstructor().newInstance();
+                if(object == BorrowRequest.class){
+                    for (int i = 0 ; i < choices.size() ; i++){
+                        BorrowRequest request = (BorrowRequest) choices.get(i);
+                        System.out.print (i+1 + ". " );
+                        printBorrowRequest(request);
+                    }
+                }else{
+                    for (int i = 0 ; i < choices.size() ; i++){
+                        System.out.println(i+1 + ". "+ choices.get(i));
+                    }
+                }
+
+                String input = reader.readLine();
+                choice = Integer.parseInt(input);
+            } catch (Exception e) {
+                System.out.println("ERROR: Sorry , could not understand your choice , please try again!");
+                choice = -1;
+                continue;
+            }
+            if(choice < 1 || choice > choices.size() ){
+                System.out.println("WRONG INPUT: please choose a valid number from the menu");
+                choice = -1;
+                continue;
+            }
+        }
+        return choice;
+    }
+
+    public ArrayList<BorrowRequest> getBorrowRequestHistory() {
         communicator.sendMessage("get borrow request history");
         Response response = communicator.receiveResponse();
         if (response.status != 200) {
@@ -81,22 +167,27 @@ public class UserController {
             return null;
         } else {
             ArrayList<BorrowRequest> requests = (ArrayList<BorrowRequest>) response.object;
-            for (int i = 0; i < requests.size(); i++) {
-                // System.out.println(i+1 + ") " + requests.get(i));
-                Book book = getBookById(requests.get(i).bookid);
-                System.out.println("Request on : " + book);
-                int lenderId = requests.get(i).lenderid;
-                if (lenderId == currentUser.id) {
-                    System.out.println("Book lender : " + currentUser.name + " (You ;)");
-                } else {
-                    User lender = getUserById(lenderId);
-                    System.out.println("Book lender : " + lender.name);
-                }
-                System.out.println("Request Status : " + requests.get(i).status);
-                System.out.println("-------------------------------------------------");
-            }
+//            for (int i = 0; i < requests.size(); i++) {
+//                System.out.print(i+1 + ") ");
+//                printBorrowRequest(requests.get(i));
+//            }
             return requests;
         }
+    }
+
+
+    void printBorrowRequest(BorrowRequest request){
+        Book book = getBookById(request.bookid);
+        System.out.println("Request on : " + book);
+        int lenderId = request.lenderid;
+        if (lenderId == currentUser.id) {
+            System.out.println("Book lender : " + currentUser.name + " (You ;)");
+        } else {
+            User lender = getUserById(lenderId);
+            System.out.println("Book lender : " + lender.name);
+        }
+        System.out.println("Request Status : " + request.status);
+        System.out.println("-------------------------------------------------");
     }
 
     public Book getBookById(int bookId) {
@@ -300,8 +391,7 @@ public class UserController {
             System.out.println("1. View Your Books Library");
             System.out.println("2. Add A Book To Your Library");
             System.out.println("3. Remove A Book From Your Library");
-            System.out.println(
-                    "4. Check Incoming Borrow Requests (ex. Accept/Reject incoming requests & Chat with borrower)");
+            System.out.println("4. Check Incoming Borrow Requests (ex. Accept/Reject incoming requests & Chat with borrower)");
             System.out.println("5. Check Borrow Your Requests History");
             System.out.println("6. Browse Books Library");
             System.out.println("7. Search Books (ex. Search by title , author , genre)");

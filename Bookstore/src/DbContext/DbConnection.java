@@ -1,10 +1,7 @@
 package DbContext;
 
-import BuisnessLogic.Models.User;
-
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Objects;
 
 
 public class DbConnection {
@@ -34,15 +31,14 @@ public class DbConnection {
         return connection;
     }
 
-    public Connection getConnection(){
-        return connection;
-    }
+//    public Connection getConnection(){
+//        return connection;
+//    }
 
      public <T> ArrayList<T> select(Class<T> tClass , String query ) {
          ResultSet resultSet;
          ArrayList<T> result = new ArrayList<>();
          try {
-             //String query = "select * from users";
              Statement statement = connection.createStatement();
              resultSet = statement.executeQuery(query);
 
@@ -50,9 +46,7 @@ public class DbConnection {
              while (resultSet.next()) {  //loops on result rows
 
                  T object = mapper.mapObject(tClass,resultSet); //passes object type and result set
-                 result.add(object);
-                 //System.out.println(object);
-             }
+                 result.add(object);}
              return result;
          } catch (Exception e) {
              e.printStackTrace();

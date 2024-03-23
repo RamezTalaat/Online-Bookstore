@@ -11,15 +11,15 @@ import java.util.ArrayList;
 
 public class UserController {
     private static ICommunicator communicator;
-    private User currentUser;
+    private final User currentUser;
     public UserController(ICommunicator _communicator , User _currentUser){
         communicator = _communicator;
         currentUser = _currentUser;
     }
 
     public void handleUser(){
-        String choice = "";
-        while (choice != "sign out"){
+        String choice;
+        while (true){
             choice = communicator.receiveMessage();
             switch (choice){
                 case "browse":{
@@ -158,7 +158,8 @@ public class UserController {
                     System.out.println("User Signing out");
                     return;
                     //break;
-                }default:{
+                }
+                default:{
                     Response response  = new Response();
                     response.status = 400;
                     response.message = "Error : Server could not parse request properly , please try again ";

@@ -1,5 +1,7 @@
 package BuisnessLogic.Models;
 
+import ClientLogic.UserController;
+
 import java.io.Serializable;
 
 public class BorrowRequest implements Serializable {
