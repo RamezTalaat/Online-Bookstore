@@ -59,6 +59,55 @@ public class UserController {
                     communicator.sendResponse(response);
                     break;
                 }
+                case"add book":{
+                    System.out.println("user in add book function");
+                    BookController bookController = new BookController();
+                    String price , genre , title , author ,description , quantity, currUserId;
+                    price = communicator.receiveMessage();
+                    genre = communicator.receiveMessage();
+                    title = communicator.receiveMessage();
+                    author = communicator.receiveMessage();
+                    description = communicator.receiveMessage();
+                    quantity = communicator.receiveMessage();
+                    currUserId = communicator.receiveMessage();
+                    double doublePrice = Double.parseDouble(price);
+                    int intQuantity = Integer.parseInt(quantity);
+                    int intCurrUserId = Integer.parseInt(currUserId);
+                    Response response = new Response();
+                    if(!bookController.addBook(doublePrice , genre , title , author , intQuantity , description, intCurrUserId))
+                    {
+                        response.status=400;
+                        response.message="Couldn't add the book";
+                        communicator.sendResponse(response);
+                    }
+                    response.status=200;
+                    response.message = "Book added successfully!";
+                    communicator.sendResponse(response);
+                    break;
+                }
+                case "add review":{
+                    System.out.println("user in add review function");
+                    BookController bookController = new BookController();
+                    String userId, bookId, rate, comment;
+                    userId = communicator.receiveMessage();
+                    bookId = communicator.receiveMessage();
+                    rate = communicator.receiveMessage();
+                    comment = communicator.receiveMessage();
+                    int intRate = Integer.parseInt(rate);
+                    int intUserId = Integer.parseInt(userId);
+                    int intBookId = Integer.parseInt(bookId);
+                    Response response = new Response();
+                    if(!bookController.addReview(intUserId, comment, intRate,intBookId))
+                    {
+                        response.status=400;
+                        response.message="Couldn't add the review on the book";
+                        communicator.sendResponse(response);
+                    }
+                    response.status=200;
+                    response.message = "Review added successfully!";
+                    communicator.sendResponse(response);
+                    break;
+                }
                 case "get user books":{
                     System.out.println("user in browse function");
                     BookController bookController = new BookController();
