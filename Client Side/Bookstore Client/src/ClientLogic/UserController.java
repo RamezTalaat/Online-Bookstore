@@ -8,6 +8,7 @@ import Communication.ICommunicator;
 
 import java.awt.*;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,7 +100,10 @@ public class UserController {
         ArrayList<Integer> inbox = (ArrayList<Integer>)response.object;
         if(inbox == null || inbox.isEmpty())
             return;
-        System.out.println("NOTIFICATION: You have waiting chatters in you inbox!");
+
+        System.out.println("*******************************************************");
+        System.out.println("*NOTIFICATION: You have waiting chatters in you inbox!*");
+        System.out.println("*******************************************************");
         ArrayList<String> choices =  new ArrayList<>(Arrays.asList("Enter a Chat" , "Chat later"));
         int choice = inputUserChoice(String.class , choices);
         if(choice == 2)
@@ -111,20 +115,51 @@ public class UserController {
             choices.add(lender.name);
         }
         choice = inputUserChoice(String.class , choices);
-        User chosenBorrower = getUserById(choice-1);
+
+        User chosenBorrower = getUserById(inbox.get(choice-1));
         System.out.println("Entering chat with " + chosenBorrower.name);
         enterChat(chosenBorrower.id);
     }
 
     public void enterChat (int lenderId){
+        communicator.sendMessage("enter chat with lender");
+        communicator.sendMessage(String.valueOf(lenderId));
+        System.out.println("Note: you are now in the chat room , Enter (exit chat) to exit");
+        ChatListener chatListener = new ChatListener(communicator);
+        chatListener.start();
+        String userInput = "";
+        while (!userInput.equals("exit chat")){
+            try {
+                userInput = reader.readLine();
+                communicator.sendMessage(userInput);
+            } catch (IOException e) {
+                System.out.println("Error : we could not understand/send your input, please try again");
+            }
+        }
 
     }
     public void startChat (int borrowerId){
-        communicator.sendMessage("start chat");
+        communicator.sendMessage("start chat with borrower");
         communicator.sendMessage(String.valueOf(borrowerId));
         Response response = communicator.receiveResponse();
         if(response.status == 200){
-            System.out.println("You are currently waiting for borrower in chat");
+            System.out.println(response.message);
+        }
+        else{
+            System.out.println(response.message);
+            return ;
+        }
+        System.out.println("Note: you are now in the chat room , Enter (exit chat) to exit");
+        ChatListener chatListener = new ChatListener(communicator);
+        chatListener.start(); //to start listening thread
+        String userInput = "";
+        while (!userInput.equals("exit chat")){
+            try {
+                userInput = reader.readLine();
+                communicator.sendMessage(userInput);
+            } catch (IOException e) {
+                System.out.println("Error : we could not understand/send your input, please try again");
+            }
         }
     }
     public void checkRequestsInbox(){
@@ -160,28 +195,37 @@ public class UserController {
         BorrowRequest chosenRequest = pendingRequests.get(choice-1);
         printBorrowRequest(chosenRequest);
         int requestNumber = choice-1;
-        optionsArray = new ArrayList<>(Arrays.asList("Accept" , "Reject"));
+        optionsArray = new ArrayList<>(Arrays.asList("Chat with borrower" , "Reject"));
         choice = inputUserChoice(String.class , optionsArray);
 
-        communicator.sendMessage("handle borrow request");
+        //communicator.sendMessage("handle borrow request");
         if(choice == 1){
             //start chat
             startChat(chosenRequest.borrowerid);
             //check if user wants to accept or reject
-
-            //accept request in server side
-
-            //communicator.sendMessage("accept");
-
+            System.out.println("After chatting with the potential borrower , would you like to :");
+            optionsArray = new ArrayList<>(Arrays.asList("Accept" , "Reject"));
+            choice = inputUserChoice(String.class , optionsArray);
+            if(choice == 1){
+                //accept request in server side
+            }
+            else{
+                //reject request in server side
+                communicator.sendMessage("reject borrow request");
+                communicator.sendMessage(String.valueOf(pendingRequests.get(requestNumber).id)); //send request id
+                Response response = communicator.receiveResponse();
+                System.out.println(response.message);
+            }
         }
         else{
             //reject request in server side
-            communicator.sendMessage("reject");
+            communicator.sendMessage("reject borrow request");
+            communicator.sendMessage(String.valueOf(pendingRequests.get(requestNumber).id)); //send request id
+            Response response = communicator.receiveResponse();
+            System.out.println(response.message);
 
         }
-        communicator.sendMessage(String.valueOf(pendingRequests.get(requestNumber).id)); //send request id
-        Response response = communicator.receiveResponse();
-        System.out.println(response.message);
+
     }
 
     public<T> int inputUserChoice( Class<T> tClass ,ArrayList<T> choices  ){ //tclass to get input for borrow requests

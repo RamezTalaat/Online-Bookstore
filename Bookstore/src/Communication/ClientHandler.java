@@ -10,6 +10,7 @@ public class ClientHandler implements Runnable , ICommunicator {
     private Socket clientSocket;
     private DataOutputStream outputStream;
     private DataInputStream inputStream;
+
     public ClientHandler(Socket clientSocket) {
         try{
             this.clientSocket = clientSocket;
