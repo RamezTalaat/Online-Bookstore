@@ -10,7 +10,7 @@ import DbContext.DbConnection;
 import java.util.ArrayList;
 
 public class UserController {
-    private static ICommunicator communicator;
+    private ICommunicator communicator;
     private final User currentUser;
     public UserController(ICommunicator _communicator , User _currentUser){
         communicator = _communicator;
@@ -23,6 +23,7 @@ public class UserController {
             choice = communicator.receiveMessage();
             switch (choice){
                 case "handle borrow request":{
+                    System.out.println();
                     String operation = communicator.receiveMessage(); //accept or reject
                     String stringRequestId = communicator.receiveMessage();
                     Response response = new Response();
