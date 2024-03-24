@@ -8,8 +8,8 @@ import java.net.Socket;
 
 public class ClientHandler implements Runnable , ICommunicator {
     private Socket clientSocket;
-    private static DataOutputStream outputStream;
-    private static DataInputStream inputStream;
+    private DataOutputStream outputStream;
+    private DataInputStream inputStream;
     public ClientHandler(Socket clientSocket) {
         try{
             this.clientSocket = clientSocket;
@@ -27,10 +27,13 @@ public class ClientHandler implements Runnable , ICommunicator {
         RegistrationController registrationController = new RegistrationController(this);
         registrationController.handleClientRequest();
         try {
+            outputStream.close();
+            inputStream.close();
             clientSocket.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
 
     }
 

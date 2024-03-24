@@ -9,7 +9,7 @@ import Communication.ICommunicator;
 import java.util.UUID;
 
 public class RegistrationController {
-    private static ICommunicator communicator;
+    private ICommunicator communicator;
     public RegistrationController(ICommunicator _communicator){
         communicator = _communicator;
     }

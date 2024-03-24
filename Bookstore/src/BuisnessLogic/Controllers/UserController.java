@@ -53,7 +53,7 @@ public class UserController {
                         returnFailureResponse("problem in borrow request handling parsing");
                         continue;
                     }
-
+                    break;
                 }
                 case "browse":{
                     System.out.println("user in browse function");

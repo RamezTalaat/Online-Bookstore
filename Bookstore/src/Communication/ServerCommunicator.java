@@ -5,8 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServerCommunicator {
-    private static ServerSocket serverSocket;
-    private static final int portNumber = 5005;
+    private ServerSocket serverSocket;
+    private final int portNumber = 5005;
 
     public ServerCommunicator(){
         try {

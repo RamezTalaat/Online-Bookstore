@@ -100,7 +100,7 @@ public class UserController {
         }
         ArrayList<BorrowRequest> pendingRequests = new ArrayList<BorrowRequest>();
         for (int i = 0 ; i < requests.size() ; i++){
-            if(requests.get(i).lenderid == currentUser.id){
+            if(requests.get(i).lenderid == currentUser.id && requests.get(i).status.equals("pending")){
                 pendingRequests.add(requests.get(i));
             }
         }
@@ -137,7 +137,7 @@ public class UserController {
             communicator.sendMessage("reject");
 
         }
-        communicator.sendMessage(String.valueOf(pendingRequests.get(requestNumber).id));
+        communicator.sendMessage(String.valueOf(pendingRequests.get(requestNumber).id)); //send request id
         Response response = communicator.receiveResponse();
         System.out.println(response.message);
     }
@@ -148,7 +148,6 @@ public class UserController {
             try {
                 System.out.println("Choose an option:");
                 if(tClass == BorrowRequest.class){
-                    System.out.println("Heeeeeeeeeeeeeere");
                     for (int i = 0 ; i < choices.size() ; i++){
                         BorrowRequest request = (BorrowRequest) choices.get(i);
                         System.out.print (i+1 + ". " );
@@ -183,6 +182,7 @@ public class UserController {
             System.out.println("Looks like you have no borrow requests history yet");
             return null;
         } else {
+            System.out.println("borrow request history object = " + response.object);
             return (ArrayList<BorrowRequest>) response.object;
         }
     }
@@ -192,11 +192,18 @@ public class UserController {
         Book book = getBookById(request.bookid);
         System.out.println("Request on : " + book);
         int lenderId = request.lenderid;
+        int borrowerId = request.borrowerid;
         if (lenderId == currentUser.id) {
             System.out.println("Book lender : " + currentUser.name + " (You ;)");
         } else {
             User lender = getUserById(lenderId);
             System.out.println("Book lender : " + lender.name);
+        }
+        if (borrowerId == currentUser.id) {
+            System.out.println("Book borrower : " + currentUser.name + " (You ;)");
+        } else {
+            User borrower = getUserById(borrowerId);
+            System.out.println("Book borrower : " + borrower.name);
         }
         System.out.println("Request Status : " + request.status);
         System.out.println("-------------------------------------------------");
@@ -400,7 +407,7 @@ public class UserController {
 
         communicator.sendMessage("borrow request");
         communicator.sendMessage(String.valueOf(currentUser.id)); // convert to strings
-        communicator.sendMessage(String.valueOf(bookNumber));
+        communicator.sendMessage(String.valueOf(books.get(accessBookNumberIndex).id));
 
         Response response = new Response();
         response = communicator.receiveResponse();
