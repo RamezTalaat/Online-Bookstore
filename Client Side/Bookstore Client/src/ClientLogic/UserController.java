@@ -65,7 +65,7 @@ public class UserController {
                     break;
                 }
                 case 7: {
-                    Search();
+                    search();
                     break;
                 }
                 case 8: {
@@ -521,8 +521,8 @@ public class UserController {
 
     }
 
-    public ArrayList<Book> Search() {
-        communicator.sendMessage("Search");
+    public ArrayList<Book> search() {
+        communicator.sendMessage("search");
         String msg = "";
         String value = "";
         int num = 0;

@@ -22,6 +22,7 @@ public class ChatListener extends Thread{
 
             for (int i = 0 ; i < sender.messageBox.size() ; i++){
                 message = sender.messageBox.get(i);
+                System.out.println("message from listener " + message);
                 receiver.sendMessage(message);
                 sender.messageBox.remove(message);
                 if(message.equals("exit chat"))//to exit loop

@@ -35,53 +35,11 @@ public class UserController {
                     break;
                 }
                 case "enter chat with lender":{
-                    String stringLenderId = communicator.receiveMessage();
-                    int lenderId = -1;
-                    try {
-                        lenderId = Integer.parseInt(stringLenderId);
-                    }catch (Exception e){
-                        returnFailureResponse("Wrong borrower id");
-                        //break; //to wait for another instruction
-                    }
-                    //get lender controller
-                    var activeUsers = ServerCommunicator.getActiveUsers();
-                    UserController lenderController = null;
-                    for (int i = 0 ; i < activeUsers.size() ; i++){
-                        if(lenderId == activeUsers.get(i).currentUser.id){
-                            lenderController = activeUsers.get(i);
-                            break;
-                        }
-                    }
-                    //2. entering in chat room
-                    if(lenderController == null){
-                        System.out.println("borrower controller is NULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
-                        for (int i = 0 ; i< waitingChats.size() ; i++){
-                            System.out.println(currentUser.id + " waiting = " + waitingChats.get(i));
-                        }
-                    }
-                    handleChat(lenderController);
+                    enterChatWithLender();
                     break;
                 }
                 case "reject borrow request":{
-                    String stringRequestId = communicator.receiveMessage(); //waiting for request id
-                    Response response = new Response();
-                    int requestId = -1;
-                    try {
-                        requestId = Integer.parseInt(stringRequestId);
-
-                    }catch (Exception e){
-                        System.out.println("Could not parse request id");
-                        returnFailureResponse("Could not parse request id");
-                    }
-
-                    RequestController requestController = new RequestController();
-                    Boolean check = requestController.rejectBorrowRequest(requestId);
-                    if(check){
-                        returnSuccessResponse("Request was rejected successfully");
-                    }
-                    else{
-                        returnFailureResponse("Could not reject request properly");
-                    }
+                    rejectBorrowRequest();
                     break;
                 }
                 case "browse":{
@@ -103,163 +61,35 @@ public class UserController {
                     break;
                 }
                 case "borrow request":{
-                    System.out.println("In borrow request");
-                    RequestController requestController = new RequestController();
-                    String stringUserID = communicator.receiveMessage();
-                    String stringBookID = communicator.receiveMessage();
-                    int userId = Integer.parseInt(stringUserID);
-                    int bookId = Integer.parseInt(stringBookID);
-                    boolean result = requestController.submitBorrowRequest(userId , bookId);
-                    Response response = new Response();
-                    if(result){
-                        response.status = 200;
-                        response.message = "book borrow request submitted successfully";
-                    }else{
-                        response.status = 400;
-                        response.message = "could not submit borrow request!";
-                    }
-                    communicator.sendResponse(response);
+                    borrowRequest();
                     break;
                 }
                 case "add book":{
-                    System.out.println("user in add book function");
-                    BookController bookController = new BookController();
-                    String price , genre , title , author ,description , quantity, currUserId;
-                    price = communicator.receiveMessage();
-                    genre = communicator.receiveMessage();
-                    title = communicator.receiveMessage();
-                    author = communicator.receiveMessage();
-                    description = communicator.receiveMessage();
-                    quantity = communicator.receiveMessage();
-                    currUserId = communicator.receiveMessage();
-                    double doublePrice = Double.parseDouble(price);
-                    int intQuantity = Integer.parseInt(quantity);
-                    int intCurrUserId = Integer.parseInt(currUserId);
-                    Response response = new Response();
-                    if(!bookController.addBook(doublePrice , genre , title , author , intQuantity , description, intCurrUserId))
-                    {
-                        response.status=400;
-                        response.message="Couldn't add the book";
-                        communicator.sendResponse(response);
-                    }
-                    response.status=200;
-                    response.message = "Book added successfully!";
-                    communicator.sendResponse(response);
+                    addBook();
                     break;
                 }
                 case "add review":{
-                    BookController bookController = new BookController();
-                    String userId, bookId, rate, comment;
-                    userId = communicator.receiveMessage();
-                    bookId = communicator.receiveMessage();
-                    rate = communicator.receiveMessage();
-                    comment = communicator.receiveMessage();
-                    int intRate = Integer.parseInt(rate);
-                    int intUserId = Integer.parseInt(userId);
-                    int intBookId = Integer.parseInt(bookId);
-                    Response response = new Response();
-                    if(!bookController.addReview(intUserId, comment, intRate,intBookId))
-                    {
-                        response.status=400;
-                        response.message="Couldn't add the review on the book";
-                        communicator.sendResponse(response);
-                    }
-                    response.status=200;
-                    response.message = "Review added successfully!";
-                    communicator.sendResponse(response);
+                    addReview();
                     break;
                 }
                 case "get user books":{
-                    BookController bookController = new BookController();
-                    ArrayList<Book> result = bookController.getUserBooks(currentUser.id);
-                    Response response = new Response();
-                    if(result.isEmpty()){
-                        response.status = 400;
-                        response.message = "No books to in your library yet";
-
-                    }else{
-                        response.status = 200;
-                        response.message = "books retrieved successfully";
-                        response.object = result;
-                    }
-                    System.out.println("get my books response = " + response);
-                    communicator.sendResponse(response);
+                    getUserBooks();
                     break;
                 }
                 case "get user by id":{
-                    String stringUserId = communicator.receiveMessage();
-                    int userid = Integer.parseInt(stringUserId);
-
-                    String query = "select * from users where id = '" + userid + "'";
-                    DbConnection dbConnection = new DbConnection();
-                    ArrayList<User> result  = dbConnection.select(User.class , query);
-                    Response response = new Response();
-                    if(result == null || result.isEmpty()){
-                        response.status = 400;
-                        response.message = "No user with this id";
-
-                    }else{
-                        response.status = 200;
-                        response.message = "user retrieved successfully";
-                        response.object = result.get(0); //to return user object not wrapped in list
-                    }
-                    communicator.sendResponse(response);
+                    getUserById();
                     break;
                 }
                 case "get book by id":{
-                    System.out.println("user in get book by id function");
-                    BookController bookController = new BookController();
-                    String stringBookId = communicator.receiveMessage();
-                    int bookId = Integer.parseInt(stringBookId);
-                    Book result = bookController.getBookById(bookId);
-                    Response response = new Response();
-                    if(result == null){
-                        response.status = 400;
-                        response.message = "No book with this id";
-
-                    }else{
-                        response.status = 200;
-                        response.message = "book retrieved successfully";
-                        response.object = result;
-                    }
-                    communicator.sendResponse(response);
+                    getBookById();
                     break;
                 }
                 case "get borrow request history":{
-                    System.out.println("user in get  borrow request history function");
-                    BookController bookController = new BookController();
-                    ArrayList<BorrowRequest> result = bookController.getBorrowRequestsHistory(currentUser.id);
-                    Response response = new Response();
-                    if(result.isEmpty()){
-                        response.status = 400;
-                        response.message = "No request history yet";
-
-                    }else{
-                        response.status = 200;
-                        response.message = "requests history retrieved successfully";
-                        response.object = result;
-                    }
-                    System.out.println("borrow requests history response = " + response);
-                    communicator.sendResponse(response);
+                    getBorrowRequestHistory();
                     break;
                 }
-                case "Search":{
-                    System.out.println("You are in the search mode");
-                    String str = communicator.receiveMessage();
-                    String value = communicator.receiveMessage();
-                    BookController bookController = new BookController();
-                    Response response = new Response();
-                    ArrayList<Book> listOfBooks = bookController.searchForBook(str,value);
-                    if(!listOfBooks.isEmpty()){
-                        response.status = 200;
-                        response.message ="list of books returned";
-                        response.object=listOfBooks;
-                    }else{
-                        response.status=400;
-                        response.message="there is no books with this "+str;
-                    }
-                    System.out.println("the returned value is "+response);
-                    communicator.sendResponse(response);
+                case "search":{
+                    search();
                     break;
                 }
                 case "sign out":{
@@ -296,7 +126,207 @@ public class UserController {
         }
         //Sign out code , close current socket connection
     }
+    public void getBorrowRequestHistory(){
+        System.out.println("user in get  borrow request history function");
+        BookController bookController = new BookController();
+        ArrayList<BorrowRequest> result = bookController.getBorrowRequestsHistory(currentUser.id);
+        Response response = new Response();
+        if(result.isEmpty()){
+            response.status = 400;
+            response.message = "No request history yet";
 
+        }else{
+            response.status = 200;
+            response.message = "requests history retrieved successfully";
+            response.object = result;
+        }
+        System.out.println("borrow requests history response = " + response);
+        communicator.sendResponse(response);
+    }
+
+    public void search(){
+        System.out.println("You are in the search mode");
+        String str = communicator.receiveMessage();
+        String value = communicator.receiveMessage();
+        BookController bookController = new BookController();
+        Response response = new Response();
+        ArrayList<Book> listOfBooks = bookController.searchForBook(str,value);
+        if(!listOfBooks.isEmpty()){
+            response.status = 200;
+            response.message ="list of books returned";
+            response.object=listOfBooks;
+        }else{
+            response.status=400;
+            response.message="there is no books with this "+str;
+        }
+        System.out.println("the returned value is "+response);
+        communicator.sendResponse(response);
+    }
+    public void getBookById(){
+        System.out.println("user in get book by id function");
+        BookController bookController = new BookController();
+        String stringBookId = communicator.receiveMessage();
+        int bookId = Integer.parseInt(stringBookId);
+        Book result = bookController.getBookById(bookId);
+        Response response = new Response();
+        if(result == null){
+            response.status = 400;
+            response.message = "No book with this id";
+
+        }else{
+            response.status = 200;
+            response.message = "book retrieved successfully";
+            response.object = result;
+        }
+        communicator.sendResponse(response);
+    }
+    public void getUserById(){
+        String stringUserId = communicator.receiveMessage();
+        int userid = Integer.parseInt(stringUserId);
+
+        String query = "select * from users where id = '" + userid + "'";
+        DbConnection dbConnection = new DbConnection();
+        ArrayList<User> result  = dbConnection.select(User.class , query);
+        Response response = new Response();
+        if(result == null || result.isEmpty()){
+            response.status = 400;
+            response.message = "No user with this id";
+
+        }else{
+            response.status = 200;
+            response.message = "user retrieved successfully";
+            response.object = result.get(0); //to return user object not wrapped in list
+        }
+        communicator.sendResponse(response);
+    }
+    public void getUserBooks(){
+        BookController bookController = new BookController();
+        ArrayList<Book> result = bookController.getUserBooks(currentUser.id);
+        Response response = new Response();
+        if(result.isEmpty()){
+            response.status = 400;
+            response.message = "No books to in your library yet";
+
+        }else{
+            response.status = 200;
+            response.message = "books retrieved successfully";
+            response.object = result;
+        }
+        System.out.println("get my books response = " + response);
+        communicator.sendResponse(response);
+    }
+    public void addReview(){
+        BookController bookController = new BookController();
+        String userId, bookId, rate, comment;
+        userId = communicator.receiveMessage();
+        bookId = communicator.receiveMessage();
+        rate = communicator.receiveMessage();
+        comment = communicator.receiveMessage();
+        int intRate = Integer.parseInt(rate);
+        int intUserId = Integer.parseInt(userId);
+        int intBookId = Integer.parseInt(bookId);
+        Response response = new Response();
+        if(!bookController.addReview(intUserId, comment, intRate,intBookId))
+        {
+            response.status=400;
+            response.message="Couldn't add the review on the book";
+            communicator.sendResponse(response);
+        }
+        response.status=200;
+        response.message = "Review added successfully!";
+        communicator.sendResponse(response);
+    }
+    public void addBook(){
+        System.out.println("user in add book function");
+        BookController bookController = new BookController();
+        String price , genre , title , author ,description , quantity, currUserId;
+        price = communicator.receiveMessage();
+        genre = communicator.receiveMessage();
+        title = communicator.receiveMessage();
+        author = communicator.receiveMessage();
+        description = communicator.receiveMessage();
+        quantity = communicator.receiveMessage();
+        currUserId = communicator.receiveMessage();
+        double doublePrice = Double.parseDouble(price);
+        int intQuantity = Integer.parseInt(quantity);
+        int intCurrUserId = Integer.parseInt(currUserId);
+        Response response = new Response();
+        if(!bookController.addBook(doublePrice , genre , title , author , intQuantity , description, intCurrUserId))
+        {
+            response.status=400;
+            response.message="Couldn't add the book";
+            communicator.sendResponse(response);
+        }
+        response.status=200;
+        response.message = "Book added successfully!";
+        communicator.sendResponse(response);
+    }
+    public void borrowRequest(){
+        System.out.println("In borrow request");
+        RequestController requestController = new RequestController();
+        String stringUserID = communicator.receiveMessage();
+        String stringBookID = communicator.receiveMessage();
+        int userId = Integer.parseInt(stringUserID);
+        int bookId = Integer.parseInt(stringBookID);
+        boolean result = requestController.submitBorrowRequest(userId , bookId);
+        Response response = new Response();
+        if(result){
+            response.status = 200;
+            response.message = "book borrow request submitted successfully";
+        }else{
+            response.status = 400;
+            response.message = "could not submit borrow request!";
+        }
+        communicator.sendResponse(response);
+    }
+    public void rejectBorrowRequest(){
+        String stringRequestId = communicator.receiveMessage(); //waiting for request id
+        Response response = new Response();
+        int requestId = -1;
+        try {
+            requestId = Integer.parseInt(stringRequestId);
+
+        }catch (Exception e){
+            System.out.println("Could not parse request id");
+            returnFailureResponse("Could not parse request id");
+        }
+
+        RequestController requestController = new RequestController();
+        Boolean check = requestController.rejectBorrowRequest(requestId);
+        if(check){
+            returnSuccessResponse("Request was rejected successfully");
+        }
+        else{
+            returnFailureResponse("Could not reject request properly");
+        }
+    }
+    public void enterChatWithLender(){
+        String stringLenderId = communicator.receiveMessage();
+        int lenderId = -1;
+        try {
+            lenderId = Integer.parseInt(stringLenderId);
+        }catch (Exception e){
+            returnFailureResponse("Wrong borrower id");
+            //break; //to wait for another instruction
+        }
+        //get lender controller
+        var activeUsers = ServerCommunicator.getActiveUsers();
+        UserController lenderController = null;
+        for (int i = 0 ; i < activeUsers.size() ; i++){
+            if(lenderId == activeUsers.get(i).currentUser.id){
+                lenderController = activeUsers.get(i);
+                break;
+            }
+        }
+        //2. entering in chat room
+        if(lenderController == null){
+            System.out.println("borrower controller is NULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+            for (int i = 0 ; i< waitingChats.size() ; i++){
+                System.out.println(currentUser.id + " waiting = " + waitingChats.get(i));
+            }
+        }
+        handleChat(lenderController);
+    }
     public void returnFailureResponse(String message){
         Response response = new Response();
         response.status = 400;
@@ -309,8 +339,6 @@ public class UserController {
         response.message = message;
         communicator.sendResponse(response);
     }
-
-
     public void startChat(){
         //1. get the borrower user controller by borrower id
         System.out.println("In start chat");
@@ -356,7 +384,6 @@ public class UserController {
 
         //communicator.receiveMessage();
     }
-
     public void handleChat(UserController otherUser){
         System.out.println("in handle chat for user" + currentUser.name);
         //1. get the otherUser listener thread
