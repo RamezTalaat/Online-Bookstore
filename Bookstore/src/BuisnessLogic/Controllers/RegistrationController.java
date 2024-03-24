@@ -5,7 +5,9 @@ import BuisnessLogic.Authentication.Response;
 import BuisnessLogic.Authentication.UserAuthenticator;
 import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
+import Communication.ServerCommunicator;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class RegistrationController {
@@ -38,6 +40,7 @@ public class RegistrationController {
                     Response response = authenticator.signIn( userName , password);
 
                     communicator.sendResponse(response);
+                    UserController userController = null;
                     if(response.status == 200){
                         User currentUser = (User)response.object;
 
@@ -45,26 +48,31 @@ public class RegistrationController {
                             AdminController adminController = new AdminController(); //still not implemented
                         }else{
 
-                            UserController userController = new UserController(communicator ,currentUser );
+                            userController = new UserController(communicator ,currentUser );
+                            //add user to active list
+                            ServerCommunicator.addActiveUser(userController);
                             userController.handleUser();
                         }
                     }
                     userChoice = "end";
+                    ServerCommunicator.removeActiveUser(userController);
                     //communicator.sendResponse(response);
                     //return;
                     break;
-                } case "sign out":{
-//                    System.out.println("in sign out");
-//                    String  Suuid =  communicator.receiveMessage();//not implemented well yet , should receive UUID
-//                    UUID uuid = UUID.fromString(Suuid);
-//                    IAuthenticator authenticator = new UserAuthenticator();
-//                    Response response = authenticator.signOut(uuid); //needs to be improved to take user id not uuid
-//                    communicator.sendResponse(response);
-//                    if(response.status == 200){
-//                        //should close connection socket
-//                    }
-                    break;
-                }default:{
+                }
+//                case "sign out":{
+////                    System.out.println("in sign out");
+////                    String  Suuid =  communicator.receiveMessage();//not implemented well yet , should receive UUID
+////                    UUID uuid = UUID.fromString(Suuid);
+////                    IAuthenticator authenticator = new UserAuthenticator();
+////                    Response response = authenticator.signOut(uuid); //needs to be improved to take user id not uuid
+////                    communicator.sendResponse(response);
+////                    if(response.status == 200){
+////                        //should close connection socket
+////                    }
+//                    break;
+//                }
+                default:{
                     Response response = new Response();
                     response.status = 400;
 

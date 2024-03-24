@@ -6,6 +6,7 @@ import BuisnessLogic.Models.BorrowRequest;
 import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class UserController {
                 "Check Borrow Your Requests History" , "Browse Books Library" , "Search Books (ex. Search by title , author , genre)",
                 "Borrow A Book (submit a borrow request)", "Add a review using Book ID" , "Sign Out"));
         int choice = inputUserChoice(String.class , optionsArray);
-        while (choice != 44) {// sign out choice
+        while (true) {// sign out breaks this loop
             switch (choice) {
                 case 1: {
                     getUserBooks();
@@ -86,11 +87,46 @@ public class UserController {
                 }
 
             }
+            checkChatInbox(); //to chat with book lenders
             choice = inputUserChoice(String.class , optionsArray);
         }
 
     }
 
+    public void checkChatInbox(){
+        communicator.sendMessage("get chat inbox");
+        Response response = communicator.receiveResponse();
+        ArrayList<Integer> inbox = (ArrayList<Integer>)response.object;
+        if(inbox == null || inbox.isEmpty())
+            return;
+        System.out.println("NOTIFICATION: You have waiting chatters in you inbox!");
+        ArrayList<String> choices =  new ArrayList<>(Arrays.asList("Enter a Chat" , "Chat later"));
+        int choice = inputUserChoice(String.class , choices);
+        if(choice == 2)
+            return;
+        choices = new ArrayList<>();
+        System.out.println("Choose a user to chat with:");
+        for (int i =0 ; i < inbox.size() ; i++){
+            User lender = getUserById(inbox.get(i));
+            choices.add(lender.name);
+        }
+        choice = inputUserChoice(String.class , choices);
+        User chosenBorrower = getUserById(choice-1);
+        System.out.println("Entering chat with " + chosenBorrower.name);
+        enterChat(chosenBorrower.id);
+    }
+
+    public void enterChat (int lenderId){
+
+    }
+    public void startChat (int borrowerId){
+        communicator.sendMessage("start chat");
+        communicator.sendMessage(String.valueOf(borrowerId));
+        Response response = communicator.receiveResponse();
+        if(response.status == 200){
+            System.out.println("You are currently waiting for borrower in chat");
+        }
+    }
     public void checkRequestsInbox(){
         //get pending requests
         ArrayList<BorrowRequest> requests = getBorrowRequestHistory();
@@ -121,15 +157,21 @@ public class UserController {
 
         choice = inputUserChoice( BorrowRequest.class, pendingRequests);
         System.out.print("You chose request =>" );
-        printBorrowRequest(pendingRequests.get(choice-1));
+        BorrowRequest chosenRequest = pendingRequests.get(choice-1);
+        printBorrowRequest(chosenRequest);
         int requestNumber = choice-1;
         optionsArray = new ArrayList<>(Arrays.asList("Accept" , "Reject"));
         choice = inputUserChoice(String.class , optionsArray);
 
         communicator.sendMessage("handle borrow request");
         if(choice == 1){
+            //start chat
+            startChat(chosenRequest.borrowerid);
+            //check if user wants to accept or reject
+
             //accept request in server side
-            communicator.sendMessage("accept");
+
+            //communicator.sendMessage("accept");
 
         }
         else{

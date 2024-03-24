@@ -5,13 +5,16 @@ import BuisnessLogic.Models.Book;
 import BuisnessLogic.Models.BorrowRequest;
 import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
+import Communication.ServerCommunicator;
 import DbContext.DbConnection;
 
 import java.util.ArrayList;
+import java.util.Queue;
 
 public class UserController {
     private ICommunicator communicator;
     private final User currentUser;
+    public ArrayList<Integer> waitingChats;
     public UserController(ICommunicator _communicator , User _currentUser){
         communicator = _communicator;
         currentUser = _currentUser;
@@ -37,7 +40,7 @@ public class UserController {
                     }
 
                     RequestController requestController = new RequestController();
-                    if(operation.equals("accept")){
+                    if(operation.equals("start chat")){
                         requestController.acceptBorrowRequest(requestId);
                     }
                     else if (operation.equals("reject")){ //reject request
@@ -239,8 +242,22 @@ public class UserController {
                 }
                 case "sign out":{
                     System.out.println("User Signing out");
+                    //remove user form active users list in server
                     return;
                     //break;
+                }
+                case "accept chat":{
+                    //1. receive borrower id to enter the chat with him and then they both start chatting
+                    //2. waiting
+                    System.out.println("active users " + ServerCommunicator.getActiveUsers().size());
+                    break;
+                }
+                case "get chat inbox":{
+                    // checks current lenders waiting to chat with users
+                    Response response = new Response();
+                    response.object = waitingChats;
+                    communicator.sendResponse(response);
+                    break;
                 }
                 default:{
                     Response response  = new Response();
@@ -265,6 +282,39 @@ public class UserController {
         response.status = 200;
         response.message = message;
         communicator.sendResponse(response);
+    }
+
+    public void startChat(){
+        //1. get the borrower user controller by borrower id
+        System.out.println("In start chat");
+        String stringBorrowerId = communicator.receiveMessage();
+        int borrowerId = -1;
+        try {
+            borrowerId = Integer.parseInt(stringBorrowerId);
+        }catch (Exception e){
+            returnFailureResponse("Wrong borrower id");
+            //break; //to wait for another instruction
+        }
+        //2. check if borrower is active
+        Boolean isActive = false;
+        var activeUsers = ServerCommunicator.getActiveUsers();
+        UserController borrowerController = null;
+        for (int i = 0 ; i < activeUsers.size() ; i++){
+            if(borrowerId == activeUsers.get(i).currentUser.id){
+                isActive = true;
+                borrowerController = activeUsers.get(i);
+                break;
+            }
+        }
+        if(!isActive){
+            returnFailureResponse("Borrower is not currently active");
+            //break;//to wait for another instruction
+        }
+        //2. waiting in chat room
+        borrowerController.waitingChats.add(currentUser.id);
+        returnSuccessResponse("lender is currently waiting for borrower");
+
+        communicator.receiveMessage();
     }
 
 }

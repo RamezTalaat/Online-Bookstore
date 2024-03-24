@@ -1,14 +1,33 @@
 package Communication;
 
+import BuisnessLogic.Controllers.UserController;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class ServerCommunicator {
     private ServerSocket serverSocket;
     private final int portNumber = 5005;
 
+    private static ArrayList<UserController> activeUsers;
+
+    public static  ArrayList<UserController> getActiveUsers(){
+        return activeUsers;
+    }
+    public static  void addActiveUser(UserController user){
+        if(user != null)
+            activeUsers.add(user);
+    }
+    public static  void removeActiveUser(UserController user){
+        if(activeUsers.contains(user))
+            activeUsers.remove(user);
+    }
+
     public ServerCommunicator(){
+        if(activeUsers == null)
+            activeUsers = new ArrayList<>();
         try {
             serverSocket = new ServerSocket(portNumber);
             while (true) {
