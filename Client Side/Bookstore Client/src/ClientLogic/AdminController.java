@@ -13,11 +13,11 @@ import java.util.Arrays;
 import java.util.UUID;
 
 public class AdminController {
-    private  User currentAdmin;
+
     private ICommunicator communicator;
     private BufferedReader reader;
-    public AdminController(ICommunicator _communicator , User user){
-        currentAdmin = user;
+    public AdminController(ICommunicator _communicator ){
+
         communicator = _communicator;
         reader = new BufferedReader(new InputStreamReader(System.in));
     }

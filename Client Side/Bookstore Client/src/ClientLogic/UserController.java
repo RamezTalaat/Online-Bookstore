@@ -174,6 +174,7 @@ public class UserController {
         communicator.sendMessage("start chat with borrower");
         communicator.sendMessage(String.valueOf(borrowerId));
         Response response = communicator.receiveResponse();
+        System.out.println("start chat response"+response);
         if(response.status == 200){
             System.out.println(response.message);
         }
@@ -373,10 +374,36 @@ public class UserController {
             return books;
         }
     }
+    public ArrayList<Book> getUserBooksWithoutPrint() {
+        communicator.sendMessage("get user books");
+        Response response = communicator.receiveResponse();
+        if (response.status != 200) {
+            System.out.println("Looks like you have no personal books yet");
+            return null;
+        } else {
+            ArrayList<Book> books = (ArrayList<Book>) response.object;
+            return books;
+        }
+    }
 
     public void addReview()
     {
-        String StringBookId, StringRate, comment=null;
+
+        var books = getUserBooksWithoutPrint();
+        if(books == null){
+            System.out.println("You have no personal/borrowed books to review");
+            return;
+        }
+        int choice = inputUserChoice(Book.class , books);
+        int choseBookIndex  = choice -1;
+        System.out.println("You want to review this book?");
+        System.out.println(books.get(choseBookIndex));
+        ArrayList<String> choices = new ArrayList<>(Arrays.asList("yes","no"));
+        choice = inputUserChoice(String.class , choices);
+        if(choice == 2)
+            return;
+
+        String StringBookId, StringRate, comment;
         int bookID=-1;
         int bookRate=-1;
         System.out.println("Enter bookID");
@@ -405,10 +432,14 @@ public class UserController {
             }
         }
         System.out.println("Enter a comment!");
-        Scanner x = new Scanner(System.in);
-        comment = x.nextLine();
+        try {
+            comment = reader.readLine();
+        }catch (Exception e){
+            System.out.println("ERROR: could not understand your input , please try again!");
+            return;
+        }
+
         communicator.sendMessage("add review");
-        communicator.sendMessage(String.valueOf(currentUser.id));
         communicator.sendMessage(String.valueOf(bookID));
         communicator.sendMessage(String.valueOf(bookRate));
         communicator.sendMessage(comment);
@@ -529,9 +560,10 @@ public class UserController {
             return null;
         } else {
             ArrayList<Book> books = (ArrayList<Book>) response.object;
-            for (int i = 0; i < books.size(); i++) {
-                System.out.println(i + 1 + ") " + books.get(i));
-            }
+            System.out.println("choose a book to view its details:");
+            int choice = inputUserChoice(Book.class , books);
+            int index = choice -1;
+            books.get(index);
             return books;
         }
 

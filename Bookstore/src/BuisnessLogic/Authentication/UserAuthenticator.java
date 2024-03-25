@@ -12,7 +12,6 @@ public class UserAuthenticator implements  IAuthenticator{
         ///Steps
         ///1. check userName in database
         ///2. add user to database
-        ///3. add to Active DB
 
         //Step 1. check userName in database
         Response response  = new Response();
@@ -21,14 +20,15 @@ public class UserAuthenticator implements  IAuthenticator{
             response.message = "null arguments are not valid , please try again";
             return response;
         }
+        System.out.println("name = " + _name + " , userName = " + _userName + " ,password = " + _password);
+
         DbConnection dbConnection = new DbConnection();
         String query = "";
-
         query = "select * from users where username='" + _userName + "'";
         //System.out.println("query = " + query);
 
         ArrayList<User> result = dbConnection.select(User.class  ,query);
-        if(!result.isEmpty()){ //custom error status 400 for reserved userName
+        if(result != null && !result.isEmpty()){ //custom error status 400 for reserved userName
             response.status = 400;
             response.message = "userName already reserved , try another one";
             return response;
@@ -72,7 +72,7 @@ public class UserAuthenticator implements  IAuthenticator{
     public Response signIn( String _userName , String _password){
         ///Steps
         ///1. get user from DB by userName
-        ///2. add to Active DB
+
 
         //Step 1. get user from DB by userName
         Response response  = new Response();
@@ -101,8 +101,6 @@ public class UserAuthenticator implements  IAuthenticator{
             return response;
         }
 
-        //Step 2. add to Active DB
-        //UUID uuid = addUserToActiveDb(result.get(0).id);
         response.status = 200;
         if(result.get(0).role.equals("admin")){
             response.message = "Admin signed in successfully";
@@ -113,29 +111,22 @@ public class UserAuthenticator implements  IAuthenticator{
         return response;
     }
 
-    public Response signOut (int id){
-        Response response = new Response();
-//        if(uuid == null){
-//            response.status = 402;
-//            response.message = "Error : UUID ";
+//    public Response signOut (int id){
+//        Response response = new Response();
+//
+//        if(id == -1){
+//            response.status = 200;
+//            response.message = "User Removed successfully";
+//            return response;
 //        }
-
-//        ActiveDatabase activeDatabase = ActiveDatabase.getInstance();
-//        activeDatabase.removeUser(uuid);
-//        int id = activeDatabase.getUserID(uuid);
-        if(id == -1){
-            response.status = 200;
-            response.message = "User Removed successfully";
-            return response;
-        }
-        response.status = 500;
-        response.message = "Error : Could not remove user";
-        return response;
-    }
+//        response.status = 500;
+//        response.message = "Error : Could not remove user";
+//        return response;
+//    }
 
     private Response errorAddingUser(){
         Response response = new Response();
-        response.status = 500; //code for internal server error
+        response.status = 400; //code for internal server error
         response.message = "Error : problem in adding user to database";
         return response;
     }

@@ -115,9 +115,10 @@ public class UserController {
                     break;
                 }
                 case "accept borrow request":{
-                    //1. receive borrower id to enter the chat with him and then they both start chatting
-                    //2. waiting
-                    System.out.println("active users " + ServerCommunicator.getActiveUsers().size());
+                    acceptBorrowRequest();
+
+//                    System.out.println("active users " + ServerCommunicator.getActiveUsers().size());
+
                     break;
                 }
                 case "get chat inbox":{
@@ -146,6 +147,7 @@ public class UserController {
         }
         //Sign out code , close current socket connection
     }
+
 
     public void removeBook(){
         String stringBookId = communicator.receiveMessage(); //1. get book id
@@ -250,7 +252,7 @@ public class UserController {
         BookController bookController = new BookController();
         ArrayList<Book> result = bookController.getUserBooks(currentUser.id);
         Response response = new Response();
-        if(result.isEmpty()){
+        if(result==null || result.isEmpty()){
             returnFailureResponse("No books to in your library yet");
         }else{
             response.status = 200;
@@ -263,23 +265,18 @@ public class UserController {
     public void addReview(){
         BookController bookController = new BookController();
         String userId, bookId, rate, comment;
-        userId = communicator.receiveMessage();
+
         bookId = communicator.receiveMessage();
         rate = communicator.receiveMessage();
         comment = communicator.receiveMessage();
         int intRate = Integer.parseInt(rate);
-        int intUserId = Integer.parseInt(userId);
         int intBookId = Integer.parseInt(bookId);
-        Response response = new Response();
-        if(!bookController.addReview(intUserId, comment, intRate,intBookId))
+        if(!bookController.addReview(currentUser.id, comment, intRate,intBookId))
         {
-            response.status=400;
-            response.message="Couldn't add the review on the book";
-            communicator.sendResponse(response);
+            returnFailureResponse("Couldn't add the review on the book");
+            return;
         }
-        response.status=200;
-        response.message = "Review added successfully!";
-        communicator.sendResponse(response);
+        returnSuccessResponse("Review added successfully!");
     }
     public void addBook(){
         System.out.println("user in add book function");
@@ -322,6 +319,7 @@ public class UserController {
     }
 
     public void acceptBorrowRequest(){
+        System.out.println("in accept request");
         String stringRequestId = communicator.receiveMessage(); //waiting for request id
         Response response = new Response();
         int requestId = -1;
@@ -331,6 +329,7 @@ public class UserController {
         }catch (Exception e){
             System.out.println("Could not parse request id");
             returnFailureResponse("Could not parse request id");
+            return;
         }
 
         RequestController requestController = new RequestController();
@@ -339,16 +338,16 @@ public class UserController {
         ArrayList<BorrowRequest> result = requestController.getBorrowRequestById(requestId);
         if(result == null || result.isEmpty()){
             returnFailureResponse("Could not accept request properly , wrong request id");
+            return;
         }
 
         BookController bookController = new BookController();
         BorrowRequest request = result.get(0);
         Boolean check = bookController.updateBookBorrower(request.bookid,request.borrowerid);
-        if(check)
-            returnSuccessResponse("Request was accepted successfully");
-        else
+        if(!check){
             returnFailureResponse("Could not accept request properly");
-
+            return;
+        }
         check = requestController.acceptBorrowRequest(requestId);
         if(check)
             returnSuccessResponse("Request was accepted successfully");
@@ -406,7 +405,7 @@ public class UserController {
             }
         }
         handleChat(lenderController , "borrower");
-        waitingChats.remove(lenderController.currentUser.id);
+        //waitingChats.remove(lenderController.currentUser.id);
     }
     public void returnFailureResponse(String message){
         Response response = new Response();
@@ -448,7 +447,6 @@ public class UserController {
         if(!isActive){
             returnFailureResponse("Borrower is not currently active");
             return;
-
         }
         //2. waiting in chat room
         if(borrowerController == null){
@@ -456,6 +454,10 @@ public class UserController {
             for (int i = 0 ; i< waitingChats.size() ; i++){
                 System.out.println(currentUser.id + " waiting = " + waitingChats.get(i));
             }
+        }
+        if(borrowerController.waitingChats == null){
+            System.out.println("making waiting chats");
+            borrowerController.waitingChats = new ArrayList<>();
         }
         borrowerController.waitingChats.add(currentUser.id);
         returnSuccessResponse("lender is currently waiting for borrower");
@@ -469,7 +471,7 @@ public class UserController {
         System.out.println("in handle chat for user " + currentUser.name);
         //1. get the otherUser listener thread
 
-        if(role.equals("borrower")){
+        if(role.equals("lender")){
             chatListenerThread = new ChatListener(this ,otherUser.communicator);
             chatListenerThread.start();
         }
@@ -484,7 +486,7 @@ public class UserController {
                 //throw new RuntimeException(e);
             }
         }
-        if(role.equals("lender")){
+        if(role.equals("borrower")){
             chatListenerThread = new ChatListener(this ,otherUser.communicator);
             chatListenerThread.start();
         }
@@ -498,6 +500,10 @@ public class UserController {
             messageBox.add(message);
 
         }
+        //close this user's listening thread
+        otherUser.messageBox.add("exit chat");
+
+        System.out.println("user " + currentUser.name + "exited chat");
 
     }
 

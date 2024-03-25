@@ -27,6 +27,7 @@ public class ClientHandler implements Runnable , ICommunicator {
     public void run() {
         RegistrationController registrationController = new RegistrationController(this);
         registrationController.handleClientRequest();
+        System.out.println("----> Ending thread");
         try {
             outputStream.close();
             inputStream.close();

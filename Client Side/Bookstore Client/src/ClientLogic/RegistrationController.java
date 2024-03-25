@@ -16,59 +16,105 @@ public class RegistrationController {
         communicator = _communicator;
         reader = new BufferedReader(new InputStreamReader(System.in));
     }
+
     public void registerClient(){
-        int choice = -1 ; //Wrong input handling loop
-        while (choice == -1){
-            choice = printRegistrationMenu();
-        }
-
-        Response response;
-        if(choice == 1){ //Sign Up scenario
-            communicator.sendMessage("sign up");
-            singUp();
-            response = communicator.receiveResponse();
-            System.out.println(response);
-        }
-        else if(choice == 2) { // Sign In scenario
-            communicator.sendMessage("sign in");
-            boolean signInDone = false;
-            while(!signInDone){
-                signIn();
-                response = communicator.receiveResponse();
-                System.out.println(response);
-                if(response.status == 200){
-                    User user = (User)response.object;
-                    if(response.message.equals("Admin signed in successfully")){//admin path
-                        System.out.println("Welcome Admin!");
-                        AdminController adminController = new AdminController(communicator ,user); // not implemented yet
-                        adminController.handleAdmin();
-                    }else{
-                        System.out.println("User Signed In Successfully");
-                        UserController userController = new UserController(communicator ,user);
-                        userController.handleUser();
-                    }
-                    signInDone = true;
-                }else if(response.status == 404){
-                    System.out.println("Incorrect username or password, Please try again");
-
-                }else if(response.status == 401){
-                    System.out.println("Incorrect password, Please try again");
-
-                }
+        boolean RegistrationIsDone  = false, isAdmin = false;
+        User currentUser = null;
+        while (!RegistrationIsDone){
+            int choice = -1 ; //Wrong input handling loop
+            while (choice == -1){
+                choice = printRegistrationMenu();
             }
-            //System.out.println(response.message);
+            if(choice == 3) {//exit condition
+                communicator.sendMessage("exit");
+                return;
+            }
+            if(choice == 1){//sign up
+                communicator.sendMessage("sign up");
+                singUp();
+            }
+            else{
+                communicator.sendMessage("sign in");
+                signIn();
+            }
+            Response response = communicator.receiveResponse();
+            if(response.status == 200){
+                RegistrationIsDone = true;
+                if(response.message == "Admin signed in successfully")
+                    isAdmin = true;
+                currentUser = (User) response.object;
+            }else{
+                System.out.println("status = " + response.status); //in SRS
+                System.out.println("PROBLEM:" + response.message);
+            }
         }
-        else{
-            System.out.println("Error : could not understand user input"); //Extra security
-            return;
+        if(isAdmin){
+            AdminController adminController = new AdminController(communicator ); // not implemented yet
+            adminController.handleAdmin();
+        }else{
+            UserController userController = new UserController(communicator ,currentUser);
+            userController.handleUser();
         }
+
 
     }
+//    public void registerClient(){
+//        int choice = -1 ; //Wrong input handling loop
+//        while (choice == -1){
+//            choice = printRegistrationMenu();
+//        }
+//
+//        if(choice ==3) //exit state
+//            return;
+//
+//        Response response;
+//        if(choice == 1){ //Sign Up scenario
+//            communicator.sendMessage("sign up");
+//            singUp();
+//            response = communicator.receiveResponse();
+//            System.out.println(response);
+//        }
+//        else if(choice == 2) { // Sign In scenario
+//            communicator.sendMessage("sign in");
+//            boolean signInDone = false;
+//            while(!signInDone){
+//                signIn();
+//                response = communicator.receiveResponse();
+//                System.out.println(response);
+//                if(response.status == 200){
+//                    User user = (User)response.object;
+//                    if(response.message.equals("Admin signed in successfully")){//admin path
+//                        System.out.println("Welcome Admin!");
+//                        AdminController adminController = new AdminController(communicator ,user); // not implemented yet
+//                        adminController.handleAdmin();
+//                    }else{
+//                        System.out.println("User Signed In Successfully");
+//                        UserController userController = new UserController(communicator ,user);
+//                        userController.handleUser();
+//                    }
+//                    signInDone = true;
+//                }else if(response.status == 404){
+//                    System.out.println("Incorrect username or password, Please try again");
+//
+//                }else if(response.status == 401){
+//                    System.out.println("Incorrect password, Please try again");
+//
+//                }
+//            }
+//            //System.out.println(response.message);
+//        }
+//        else{
+//            System.out.println("Error : could not understand user input"); //Extra security
+//            return;
+//        }
+//
+//    }
 
     public int printRegistrationMenu(){
         System.out.println("User Registration: ");
         System.out.println("1. Sign up");
         System.out.println("2. Sign in");
+        System.out.println("3. Exit");
         System.out.print("Choose an option:  ");
         try {
             String choice = reader.readLine();
@@ -77,7 +123,11 @@ public class RegistrationController {
                     return 1;
                 } case "2":{
                     return 2;
-                } default:{
+                }
+                case "3":{
+                    return 3;
+                }
+                default:{
                     System.out.println("Error : please enter a valid input");
                     return -1;
                 }
@@ -99,8 +149,8 @@ public class RegistrationController {
             password = reader.readLine();
             communicator.sendMessage(userName);
             communicator.sendMessage(password);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            System.out.println("Could not understand your input!");
         }
     }
     public void singUp(){
@@ -115,8 +165,8 @@ public class RegistrationController {
             communicator.sendMessage(name);
             communicator.sendMessage(userName);
             communicator.sendMessage(password);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            System.out.println("Could not understand your input!");
         }
     }
 
