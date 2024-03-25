@@ -95,12 +95,6 @@ public class UserController {
                     search();
                     break;
                 }
-                case "sign out":{
-                    System.out.println("User Signing out");
-                    //remove user form active users list in server
-                    return;
-                    //break;
-                }
                 case "accept borrow request":{
                     //1. receive borrower id to enter the chat with him and then they both start chatting
                     //2. waiting
@@ -117,6 +111,10 @@ public class UserController {
                     response.object = waitingChats;
                     communicator.sendResponse(response);
                     break;
+                } case "sign out":{
+                    System.out.println("User Signing out");
+                    //remove user form active users list in server
+                    return;
                 }
                 default:{
                     Response response  = new Response();

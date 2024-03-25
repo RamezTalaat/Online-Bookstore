@@ -110,11 +110,13 @@ public class UserController {
         choice = inputUserChoice(String.class ,choices);
         if(choice == 2)
             return;
+
         //System.out.println("book id = " + chosenBook.borrowerid);
         if(  chosenBook.borrowerid != -1 && chosenBook.borrowerid != 0){
             System.out.println("Book is already borrowed , can not currently be removed");
             return;
         }
+
         communicator.sendMessage("remove book");
         communicator.sendMessage(String.valueOf(chosenBook.id));
         response = communicator.receiveResponse();
