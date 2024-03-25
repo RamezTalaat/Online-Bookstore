@@ -52,11 +52,12 @@ public class UserController {
                 }
                 case 5: {
                     var requests = getBorrowRequestHistory();
-                    if(requests != null || ! requests.isEmpty()){
-                        for (int i = 0 ; i < requests.size() ; i++){
-                            System.out.print(i+1 + ") ");
-                            printBorrowRequest(requests.get(i));
-                        }
+                    if(requests == null || requests.isEmpty())
+                        break;
+
+                    for (int i = 0 ; i < requests.size() ; i++){
+                        System.out.print(i+1 + ") ");
+                        printBorrowRequest(requests.get(i));
                     }
                     break;
                 }
