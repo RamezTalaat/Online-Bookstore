@@ -45,7 +45,8 @@ public class RegistrationController {
                         User currentUser = (User)response.object;
 
                         if(response.message.equals("Admin signed in successfully")){
-                            AdminController adminController = new AdminController(); //still not implemented
+                            AdminController adminController = new AdminController(communicator);
+                            adminController.handleAdmin();
                         }else{
 
                             userController = new UserController(communicator ,currentUser );
