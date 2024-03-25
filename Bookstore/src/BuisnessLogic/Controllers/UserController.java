@@ -204,16 +204,14 @@ public class UserController {
         ArrayList<Book> result = bookController.getUserBooks(currentUser.id);
         Response response = new Response();
         if(result.isEmpty()){
-            response.status = 400;
-            response.message = "No books to in your library yet";
-
+            returnFailureResponse("No books to in your library yet");
         }else{
             response.status = 200;
             response.message = "books retrieved successfully";
             response.object = result;
+            communicator.sendResponse(response);
         }
-        System.out.println("get my books response = " + response);
-        communicator.sendResponse(response);
+
     }
     public void addReview(){
         BookController bookController = new BookController();
@@ -246,20 +244,16 @@ public class UserController {
         author = communicator.receiveMessage();
         description = communicator.receiveMessage();
         quantity = communicator.receiveMessage();
-        currUserId = communicator.receiveMessage();
         double doublePrice = Double.parseDouble(price);
         int intQuantity = Integer.parseInt(quantity);
-        int intCurrUserId = Integer.parseInt(currUserId);
+
         Response response = new Response();
-        if(!bookController.addBook(doublePrice , genre , title , author , intQuantity , description, intCurrUserId))
+        boolean check = bookController.addBook(doublePrice , genre , title , author , intQuantity , description, currentUser.id);
+        if(!check)
         {
-            response.status=400;
-            response.message="Couldn't add the book";
-            communicator.sendResponse(response);
+            returnFailureResponse("Book (" + title+ ") Could not be added successfully");
         }
-        response.status=200;
-        response.message = "Book added successfully!";
-        communicator.sendResponse(response);
+        returnSuccessResponse("Book (" + title+ ") added successfully!");
     }
     public void borrowRequest(){
         System.out.println("In borrow request");
@@ -459,9 +453,5 @@ public class UserController {
         }
 
     }
-
-
-
-
 
 }

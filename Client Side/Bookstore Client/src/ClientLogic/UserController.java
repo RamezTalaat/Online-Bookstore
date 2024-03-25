@@ -6,7 +6,6 @@ import BuisnessLogic.Models.BorrowRequest;
 import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
 
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,7 +39,7 @@ public class UserController {
                     break;
                 }
                 case 2: {
-
+                    addBook();
                     break;
                 }
                 case 3: {
@@ -237,6 +236,7 @@ public class UserController {
         int choice = -1;
         while (choice == -1){
             try {
+                System.out.println("*---------------------------------------------------------------------------------*");
                 System.out.println("Choose an option:");
                 if(tClass == BorrowRequest.class){
                     for (int i = 0 ; i < choices.size() ; i++){
@@ -401,7 +401,7 @@ public class UserController {
                 StringPrice = reader.readLine();
                 bookPrice = Double.parseDouble(StringPrice);
                 if(bookPrice<0)
-                    throw new Exception("Sorry , please re-enter a valid price");
+                    System.out.println("Sorry , please re-enter a valid price");
             } catch (Exception e) {
                 System.out.println("Sorry , please re-enter a valid price");
                 bookPrice = -1;
@@ -413,7 +413,7 @@ public class UserController {
                 StringQuantity = reader.readLine();
                 bookQuantity = Integer.parseInt(StringQuantity);
                 if(bookQuantity<0)
-                    throw new Exception("Sorry , please re-enter a valid quantity");
+                    System.out.println("Sorry , please re-enter a valid quantity");
             } catch (Exception e) {
                 System.out.println("Sorry , please re-enter a valid book quantity");
                 bookQuantity = -1;
@@ -421,13 +421,13 @@ public class UserController {
         }
         while(title == null || author == null || genre == null) {
             try {
-                System.out.println("Please entre the book title");
+                System.out.println("Please enter the book title");
                 title = reader.readLine();
-                System.out.println("Please entre the book genre");
+                System.out.println("Please enter the book genre");
                 genre = reader.readLine();
-                System.out.println("Please entre the book author");
+                System.out.println("Please enter the book author");
                 author = reader.readLine();
-                System.out.println("Please entre the book description");
+                System.out.println("Please enter the book description");
                 description = reader.readLine();
                 if(title == null || author == null || genre == null)
                     throw new Exception("Sorry , please re-enter a valid book information.");
@@ -442,7 +442,6 @@ public class UserController {
         communicator.sendMessage(author);
         communicator.sendMessage(description);
         communicator.sendMessage(String.valueOf(bookQuantity));
-        communicator.sendMessage(String.valueOf(currentUser.id));
         Response response = new Response();
         response = communicator.receiveResponse();
         if (response.status != 200) {
