@@ -37,23 +37,43 @@ public class RegistrationController {
                     String userName = communicator.receiveMessage();
                     String password = communicator.receiveMessage();
                     IAuthenticator authenticator = new UserAuthenticator();
-                    Response response = authenticator.signIn( userName , password);
-
-                    communicator.sendResponse(response);
-                    UserController userController = null;
-                    if(response.status == 200){
-                        User currentUser = (User)response.object;
-
-                        if(response.message.equals("Admin signed in successfully")){
-                            AdminController adminController = new AdminController(communicator);
-                            adminController.handleAdmin();
+                    Response response ;
+                    boolean signInSucc = false;
+                    do{
+                        System.out.println("iam here1");
+                        response = authenticator.signIn(userName,password);
+                        System.out.println("iam here2");
+                        communicator.sendResponse(response);
+                        if(response.status == 200){
+                            System.out.println("true");
+                            signInSucc = true;
+                        }else if(response.status == 404){
+                            System.out.println("iam here3");
+                            communicator.sendResponse(response);
+                            userName = communicator.receiveMessage();
+                            password = communicator.receiveMessage();
+                            response=authenticator.signIn(userName,password);
+                        }else if(response.status == 401){
+                            communicator.sendResponse(response);
+                            userName = communicator.receiveMessage();
+                            password = communicator.receiveMessage();
+                            response=authenticator.signIn(userName,password);
                         }else{
-
-                            userController = new UserController(communicator ,currentUser );
-                            //add user to active list
-                            ServerCommunicator.addActiveUser(userController);
-                            userController.handleUser();
+                            signInSucc = true;
                         }
+                    }while (!signInSucc);
+                    UserController userController = null;
+                    User currentUser = (User) response.object;
+                    //System.out.println("iam here signIN");
+                    if(response.message.equals("Admin signed in successfully")){
+                        AdminController adminController = new AdminController(communicator);
+                        adminController.handleAdmin();
+                    }else{
+                        //System.out.println("iam here signIN");
+                        userController = new UserController(communicator ,currentUser );
+                        //add user to active list
+                        ServerCommunicator.addActiveUser(userController);
+                        userController.handleUser();
                     }
                     userChoice = "end";
                     ServerCommunicator.removeActiveUser(userController);

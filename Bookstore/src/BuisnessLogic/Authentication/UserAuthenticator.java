@@ -88,7 +88,7 @@ public class UserAuthenticator implements  IAuthenticator{
 
 
         ArrayList<User> result = dbConnection.select(User.class  ,query);
-        if(result.isEmpty()){ //custom error status 400 for reserved userName
+        if(result==null || result.isEmpty()){ //custom error status 400 for reserved userName
             response.status = 404;
             response.message = "Error : userName is not found!";
             return response;
