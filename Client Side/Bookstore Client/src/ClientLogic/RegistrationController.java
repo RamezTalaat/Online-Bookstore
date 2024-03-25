@@ -58,57 +58,6 @@ public class RegistrationController {
 
 
     }
-//    public void registerClient(){
-//        int choice = -1 ; //Wrong input handling loop
-//        while (choice == -1){
-//            choice = printRegistrationMenu();
-//        }
-//
-//        if(choice ==3) //exit state
-//            return;
-//
-//        Response response;
-//        if(choice == 1){ //Sign Up scenario
-//            communicator.sendMessage("sign up");
-//            singUp();
-//            response = communicator.receiveResponse();
-//            System.out.println(response);
-//        }
-//        else if(choice == 2) { // Sign In scenario
-//            communicator.sendMessage("sign in");
-//            boolean signInDone = false;
-//            while(!signInDone){
-//                signIn();
-//                response = communicator.receiveResponse();
-//                System.out.println(response);
-//                if(response.status == 200){
-//                    User user = (User)response.object;
-//                    if(response.message.equals("Admin signed in successfully")){//admin path
-//                        System.out.println("Welcome Admin!");
-//                        AdminController adminController = new AdminController(communicator ,user); // not implemented yet
-//                        adminController.handleAdmin();
-//                    }else{
-//                        System.out.println("User Signed In Successfully");
-//                        UserController userController = new UserController(communicator ,user);
-//                        userController.handleUser();
-//                    }
-//                    signInDone = true;
-//                }else if(response.status == 404){
-//                    System.out.println("Incorrect username or password, Please try again");
-//
-//                }else if(response.status == 401){
-//                    System.out.println("Incorrect password, Please try again");
-//
-//                }
-//            }
-//            //System.out.println(response.message);
-//        }
-//        else{
-//            System.out.println("Error : could not understand user input"); //Extra security
-//            return;
-//        }
-//
-//    }
 
     public int printRegistrationMenu(){
         System.out.println("User Registration: ");

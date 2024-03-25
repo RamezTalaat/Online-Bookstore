@@ -404,21 +404,8 @@ public class UserController {
             return;
 
         String StringBookId, StringRate, comment;
-        int bookID=-1;
+
         int bookRate=-1;
-        System.out.println("Enter bookID");
-        while (bookID < 0) {
-            System.out.print("Enter the id of the book you want to review: ");
-            try {
-                StringBookId = reader.readLine();
-                bookID = Integer.parseInt(StringBookId);
-                if(bookID <= 0)
-                    throw new Exception("Sorry , please re-enter a valid book id");
-            } catch (Exception e) {
-                System.out.println("Sorry , please re-enter a valid book id");
-                bookID = -1;
-            }
-        }
         while (bookRate < 0) {
             System.out.print("Enter the rating of the book you want to add to review (ex. 0~10): ");
             try {
@@ -440,7 +427,7 @@ public class UserController {
         }
 
         communicator.sendMessage("add review");
-        communicator.sendMessage(String.valueOf(bookID));
+        communicator.sendMessage(String.valueOf(books.get(choseBookIndex).id));
         communicator.sendMessage(String.valueOf(bookRate));
         communicator.sendMessage(comment);
         Response response = new Response();
