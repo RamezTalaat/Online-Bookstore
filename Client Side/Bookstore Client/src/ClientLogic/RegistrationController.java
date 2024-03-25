@@ -45,6 +45,7 @@ public class RegistrationController {
             if(response.message.equals("Admin signed in successfully")){//admin path
                 System.out.println("Welcome Admin!");
                 AdminController adminController = new AdminController(communicator ,user); // not implemented yet
+                adminController.handleAdmin();
             }else{
                 System.out.println("User Signed In Successfully");
                 UserController userController = new UserController(communicator ,user);

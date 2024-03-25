@@ -36,6 +36,7 @@ public class AdminController {
                     break;
                 }
                 case 3: {
+                    getBorrowRequests();
 //                    var requests = getBorrowRequests();
 //                    UserController adminUserController = new UserController(communicator, currentAdmin);
 //                    if(requests != null || ! requests.isEmpty()){
@@ -99,7 +100,6 @@ public class AdminController {
             return books;
         }
     }
-
     public ArrayList<Book> getBorrowedBooks() {
         communicator.sendMessage("get borrowed books");
         Response response = communicator.receiveResponse();
@@ -114,18 +114,63 @@ public class AdminController {
             return books;
         }
     }
-//    public ArrayList<BorrowRequest> getBorrowRequests() {
-//        communicator.sendMessage("get borrow requests");
-//        Response response = communicator.receiveResponse();
-//        if (response.status != 200) {
-//            System.out.println("Looks there is no borrow requests");
-//            return null;
-//        } else {
-//            ArrayList<BorrowRequest> borrowRequests = (ArrayList<BorrowRequest>) response.object;
-//            for (int i = 0; i < borrowRequests.size(); i++) {
-//                System.out.println(i + 1 + ") " + borrowRequests.get(i));
-//            }
-//            return borrowRequests;
-//        }
-//    }
+    public ArrayList<BorrowRequest> getBorrowRequests() {
+
+        communicator.sendMessage("get borrow requests");
+        Response response = communicator.receiveResponse();
+        if (response.status != 200) {
+            System.out.println("Looks there is no borrow requests");
+            return null;
+        } else {
+            ArrayList<BorrowRequest> borrowRequests = (ArrayList<BorrowRequest>) response.object;
+            for (int i = 0; i < borrowRequests.size(); i++) {
+                printBorrowRequest(borrowRequests.get(i));
+                //System.out.println(i + 1 + ") " + );
+            }
+            return borrowRequests;
+        }
+    }
+
+    void printBorrowRequest(BorrowRequest request){
+        Book book = getBookById(request.bookid);
+        System.out.println("Request on : " + book);
+        int lenderId = request.lenderid;
+        int borrowerId = request.borrowerid;
+
+        User lender = getUserById(lenderId);
+        System.out.println("Book lender : " + lender.name);
+
+        User borrower = getUserById(borrowerId);
+        System.out.println("Book borrower : " + borrower.name);
+        System.out.println("Request Status : " + request.status);
+        System.out.println("-------------------------------------------------");
+    }
+
+    public Book getBookById(int bookId) {
+        communicator.sendMessage("get book by id");
+        String stringBookId = String.valueOf(bookId);
+        communicator.sendMessage(stringBookId);
+        Response response = communicator.receiveResponse();
+        if (response.status != 200) {
+            System.out.println(response.message);
+            return null;
+        } else {
+            Book book = (Book) response.object;
+            return book;
+        }
+    }
+
+    public User getUserById(int userid) {
+        communicator.sendMessage("get user by id");
+        String stringUserId = String.valueOf(userid);
+        communicator.sendMessage(stringUserId);
+        Response response = communicator.receiveResponse();
+        if (response.status != 200) {
+            System.out.println(response.message);
+            return null;
+        } else {
+            User user = (User) response.object;
+            return user;
+        }
+    }
 }

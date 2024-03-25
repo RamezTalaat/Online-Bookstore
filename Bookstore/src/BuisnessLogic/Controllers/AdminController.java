@@ -54,24 +54,25 @@ public class AdminController {
                     communicator.sendResponse(response);
                     break;
                 }
-//                case "get borrow requests":{
-//                    System.out.println("admin in get borrow requests function");
-//                    BookController bookController = new BookController();
-//                    ArrayList<BorrowRequest> result = bookController.getBorrowRequestsAdmin();
-//                    Response response = new Response();
-//                    if(result.isEmpty()){
-//                        response.status = 400;
-//                        response.message = "No borrow requests";
-//
-//                    }else{
-//                        response.status = 200;
-//                        response.message = "Borrow requests retrieved successfully";
-//                        response.object = result;
-//                    }
-//                    System.out.println("browse response = " + response);
-//                    communicator.sendResponse(response);
-//                    break;
-//                }
+                case "get borrow requests":{
+                    System.out.println("admin in get borrow requests function");
+                    RequestController requestController = new RequestController();
+                    var requests = requestController.getBorrowRequests();
+
+                    if(requests == null ||requests.isEmpty() ){
+                        returnFailureResponse("No borrow requests yet");
+                        break;
+                    }
+
+                    Response response = new Response();
+                    response.status = 200;
+                    response.message = "Borrow requests retrieved successfully";
+                    response.object = requests;
+
+                    System.out.println("browse response = " + response);
+                    communicator.sendResponse(response);
+                    break;
+                }
                 case "sign out":{
                     System.out.println("Admin Signing out");
                     //remove user form active users list in server
@@ -88,5 +89,18 @@ public class AdminController {
             }
         }
         //Sign out code , close current socket connection
+    }
+
+    public void returnFailureResponse(String message){
+        Response response = new Response();
+        response.status = 400;
+        response.message = message;
+        communicator.sendResponse(response);
+    }
+    public void returnSuccessResponse(String message){
+        Response response = new Response();
+        response.status = 200;
+        response.message = message;
+        communicator.sendResponse(response);
     }
 }
