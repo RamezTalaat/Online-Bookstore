@@ -139,4 +139,25 @@ public class BookController {
         }
         return true;
     }
+    public ArrayList<Book> getAvailableBooksAdmin()
+    {
+        String query = "SELECT * FROM books WHERE borrowerid IS NULL";
+        ArrayList<Book> result ;
+        result = dbConnection.select(Book.class,query);
+        return result;
+    }
+    public ArrayList<Book> getBorrowedBooksAdmin()
+    {
+        String query = "SELECT * FROM books WHERE borrowerid IS NOT NULL";
+        ArrayList<Book> result ;
+        result = dbConnection.select(Book.class,query);
+        return result;
+    }
+    public ArrayList<BorrowRequest> getBorrowRequestsAdmin()
+    {
+        String query = "SELECT * FROM borrowrequests";
+        ArrayList<BorrowRequest> result ;
+        result = dbConnection.select(BorrowRequest.class,query);
+        return result;
+    }
 }
