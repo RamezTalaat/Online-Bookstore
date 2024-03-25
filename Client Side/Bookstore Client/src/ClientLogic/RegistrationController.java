@@ -31,27 +31,36 @@ public class RegistrationController {
         }
         else if(choice == 2) { // Sign In scenario
             communicator.sendMessage("sign in");
-            signIn();
-            response = communicator.receiveResponse();
+            boolean signInDone = false;
+            while(!signInDone){
+                signIn();
+                response = communicator.receiveResponse();
+                System.out.println(response);
+                if(response.status == 200){
+                    User user = (User)response.object;
+                    if(response.message.equals("Admin signed in successfully")){//admin path
+                        System.out.println("Welcome Admin!");
+                        AdminController adminController = new AdminController(communicator ,user); // not implemented yet
+                        adminController.handleAdmin();
+                    }else{
+                        System.out.println("User Signed In Successfully");
+                        UserController userController = new UserController(communicator ,user);
+                        userController.handleUser();
+                    }
+                    signInDone = true;
+                }else if(response.status == 404){
+                    System.out.println("Incorrect username or password, Please try again");
+
+                }else if(response.status == 401){
+                    System.out.println("Incorrect password, Please try again");
+
+                }
+            }
             //System.out.println(response.message);
         }
         else{
             System.out.println("Error : could not understand user input"); //Extra security
             return;
-        }
-        if(response.status == 200){
-            User user = (User)response.object;
-
-            if(response.message.equals("Admin signed in successfully")){//admin path
-                System.out.println("Welcome Admin!");
-                AdminController adminController = new AdminController(communicator ,user); // not implemented yet
-                adminController.handleAdmin();
-            }else{
-                System.out.println("User Signed In Successfully");
-                UserController userController = new UserController(communicator ,user);
-                userController.handleUser();
-            }
-
         }
 
     }
