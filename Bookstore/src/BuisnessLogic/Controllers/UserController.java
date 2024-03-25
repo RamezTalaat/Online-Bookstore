@@ -135,6 +135,15 @@ public class UserController {
                     System.out.println("User Signing out");
                     //remove user form active users list in server
                     return;
+                } case "get accumulative rate by id":{
+                    String id = communicator.receiveMessage();
+                    int ID = Integer.parseInt(id);
+                    ReviewController reviewController = new ReviewController();
+                    int rate = reviewController.rates(ID);
+                    Response response = new Response();
+                    response.object= rate;
+                    communicator.sendResponse(response);
+                    break;
                 }
                 default:{
                     Response response  = new Response();
