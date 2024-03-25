@@ -21,4 +21,14 @@ public class ReviewController {
         String query = "select * from reviews where bookid='" +  bookId+ "'";
         return dbConnection.select(Review.class,query);
     }
+    public int rates(int bookId){
+        String query = "select * from reviews where bookid='" +  bookId+ "'";
+        ArrayList<Review> res = dbConnection.select(Review.class, query);
+        int sum = 0;
+        for (int i = 0; i < res.size(); i++) {
+            sum = sum + res.get(i).rate;
+        }
+        int accumilativeRate = sum /res.size();
+        return accumilativeRate;
+    }
 }

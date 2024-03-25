@@ -276,6 +276,12 @@ public class UserController {
                         System.out.print (i+1 + ". " );
                         printBorrowRequest(request);
                     }
+                }else if(tClass == Book.class){
+                    for(int i = 0 ;i < choices.size() ; i++){
+                        Book book = (Book) choices.get(i);
+                        System.out.print(i+1+")");
+                        printIndetailed(book);
+                    }
                 }
                 else{
                     for (int i = 0 ; i < choices.size() ; i++){
@@ -310,7 +316,9 @@ public class UserController {
             return (ArrayList<BorrowRequest>) response.object;
         }
     }
-
+    void printIndetailed(Book book){
+        System.out.println("(Title): "+book.title+" (Genre): "+book.genre+" (Author):"+book.author);
+    }
     void printBorrowRequest(BorrowRequest request){
         Book book = getBookById(request.bookid);
         System.out.println("Request on : " + book);
@@ -559,11 +567,15 @@ public class UserController {
             System.out.println("Looks like there is no current books to browse , sorry!");
             return null;
         } else {
+            //Book ------
             ArrayList<Book> books = (ArrayList<Book>) response.object;
             System.out.println("choose a book to view its details:");
-            int choice = inputUserChoice(Book.class , books);
-            int index = choice -1;
-            books.get(index);
+            int choice = inputUserChoice(Book.class, books);
+            Book book = books.get(choice-1);
+            communicator.sendMessage("get accumulative rate by id");
+            communicator.sendMessage(String.valueOf(book.id));
+            response = communicator.receiveResponse();
+            System.out.print(book+"\n Rate: "+response.object+"\n");
             return books;
         }
 
