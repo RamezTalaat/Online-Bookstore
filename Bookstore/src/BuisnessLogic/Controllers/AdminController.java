@@ -3,7 +3,9 @@ package BuisnessLogic.Controllers;
 import BuisnessLogic.Authentication.Response;
 import BuisnessLogic.Models.Book;
 import BuisnessLogic.Models.BorrowRequest;
+import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
+import DbContext.DbConnection;
 
 import java.util.ArrayList;
 
@@ -54,6 +56,14 @@ public class AdminController {
                     communicator.sendResponse(response);
                     break;
                 }
+                case "get book by id":{
+                    getBookById();
+                    break;
+                }
+                case "get user by id":{
+                    getUserById();
+                    break;
+                }
                 case "get borrow requests":{
                     System.out.println("admin in get borrow requests function");
                     RequestController requestController = new RequestController();
@@ -101,6 +111,43 @@ public class AdminController {
         Response response = new Response();
         response.status = 200;
         response.message = message;
+        communicator.sendResponse(response);
+    }
+    public void getBookById(){
+        System.out.println("admin in get book by id function.");
+        BookController bookController = new BookController();
+        String stringBookId = communicator.receiveMessage();
+        int bookId = Integer.parseInt(stringBookId);
+        Book result = bookController.getBookById(bookId);
+        Response response = new Response();
+        if(result == null){
+            response.status = 400;
+            response.message = "No book with this id";
+
+        }else{
+            response.status = 200;
+            response.message = "book retrieved successfully";
+            response.object = result;
+        }
+        communicator.sendResponse(response);
+    }
+    public void getUserById(){
+        String stringUserId = communicator.receiveMessage();
+        int userid = Integer.parseInt(stringUserId);
+        System.out.println("admin in get user by id function.");
+        String query = "select * from users where id = '" + userid + "'";
+        DbConnection dbConnection = new DbConnection();
+        ArrayList<User> result  = dbConnection.select(User.class , query);
+        Response response = new Response();
+        if(result == null || result.isEmpty()){
+            response.status = 400;
+            response.message = "No user with this id";
+
+        }else{
+            response.status = 200;
+            response.message = "user retrieved successfully";
+            response.object = result.get(0); //to return user object not wrapped in list
+        }
         communicator.sendResponse(response);
     }
 }
