@@ -52,11 +52,12 @@ public class UserController {
                 }
                 case 5: {
                     var requests = getBorrowRequestHistory();
-                    if(requests != null || ! requests.isEmpty()){
-                        for (int i = 0 ; i < requests.size() ; i++){
-                            System.out.print(i+1 + ") ");
-                            printBorrowRequest(requests.get(i));
-                        }
+                    if(requests == null || requests.isEmpty())
+                        break;
+
+                    for (int i = 0 ; i < requests.size() ; i++){
+                        System.out.print(i+1 + ") ");
+                        printBorrowRequest(requests.get(i));
                     }
                     break;
                 }
@@ -482,54 +483,35 @@ public class UserController {
     }
     public void submitABorrowRequest() {
         // to get books to borrow
-        ArrayList<Book> books = browseBooks();
-        if (books == null) {
+        communicator.sendMessage("get all books");
+        Response response = communicator.receiveResponse();
+        if(response == null ||response.object == null ){
             System.out.println("Sorry , No current books to borrow!");
             return;
         }
-        int bookNumber = -1;
-        String bookNumberString = "";
-        while (bookNumber > books.size() || bookNumber < 1) {
-            System.out.print("Enter the book number you want to borrow (ex. 1): ");
-            try {
-                bookNumberString = reader.readLine();
-                bookNumber = Integer.parseInt(bookNumberString);
-            } catch (Exception e) {
-                System.out.println("Sorry , please re-enter a valid book number");
-                bookNumber = -1;
-            }
-        }
+        ArrayList<Book> books = (ArrayList<Book>)response.object;
+        System.out.println("Choose a book to borrow:");
+        int choice = inputUserChoice(Book.class , books);
+        int accessBookNumberIndex = choice-1;
 
-        System.out.println("book number = " + bookNumber);
-        String choice = "";
-        System.out.println("Are you sure you want to submit a borrow request for this book ? (yes or no)");
-        int accessBookNumberIndex = bookNumber - 1;
-        System.out.println(books.get(accessBookNumberIndex));
-        try {
-            choice = reader.readLine();
-            choice = choice.toLowerCase();
-            if (!choice.equals("yes") && !choice.equals("no")) {
-                System.out.println("Error : we could not comprehend your input! , please try again");
-                return;
-            }
-            if (choice.equals("no")) {
-                return;
-            }
-            System.out.println(currentUser);
-            if (books.get(accessBookNumberIndex).ownerid == currentUser.id) {
-                System.out.println("You already are the owner of this book");
-                return;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("Error : we could not comprehend your input!");
+        System.out.println("book number = " + (choice));
+
+        System.out.println("Are you sure you want to submit a borrow request for this book ?");
+        ArrayList<String> choices = new ArrayList<>(Arrays.asList("yes","no"));
+        choice = inputUserChoice(String.class,choices);
+
+
+        if (books.get(accessBookNumberIndex).ownerid == currentUser.id) {
+            System.out.println(books.get(accessBookNumberIndex));
+            System.out.println("You already are the owner of this book");
+            return;
         }
 
         communicator.sendMessage("borrow request");
         communicator.sendMessage(String.valueOf(currentUser.id)); // convert to strings
         communicator.sendMessage(String.valueOf(books.get(accessBookNumberIndex).id));
 
-        Response response = new Response();
+        response = new Response();
         response = communicator.receiveResponse();
         if (response.status != 200) {
             System.out.println("Sorry , the request was not submitted , try again");

@@ -36,4 +36,8 @@ public class RequestController {
         String query = "select * from borrowrequests where id='" + requestId+"'";
         return dbConnection.select(BorrowRequest.class ,  query);
     }
+    public ArrayList<BorrowRequest> getBorrowRequests(){
+        String query = "select * from borrowrequests";
+        return dbConnection.select(BorrowRequest.class ,  query);
+    }
 }

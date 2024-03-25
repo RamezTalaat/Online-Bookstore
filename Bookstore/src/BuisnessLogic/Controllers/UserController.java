@@ -46,7 +46,7 @@ public class UserController {
                     BookController bookController = new BookController();
                     ArrayList<Book> result = bookController.browseBooks();
                     Response response = new Response();
-                    if(result.isEmpty()){
+                    if(result == null || result.isEmpty()){
                         response.status = 400;
                         response.message = "No books to browse now";
 
@@ -58,6 +58,25 @@ public class UserController {
                     System.out.println("browse response = " + response);
                     communicator.sendResponse(response);
                     break;
+                }
+                case "get all books":{
+                    BookController bookController = new BookController();
+                    ArrayList<Book> result = bookController.browseBooks();
+                    if(result == null || result.isEmpty()){
+                        returnFailureResponse("No books to browse now");
+                        break;
+
+                    }else{
+                        Response response = new Response();
+                        response.status = 200;
+                        response.message = "books retrieved successfully";
+                        response.object = result;
+                        System.out.println("browse response = " + response);
+                        communicator.sendResponse(response);
+                    }
+
+                    break;
+
                 }
                 case "borrow request":{
                     borrowRequest();
@@ -158,16 +177,16 @@ public class UserController {
         System.out.println("user in get  borrow request history function");
         BookController bookController = new BookController();
         ArrayList<BorrowRequest> result = bookController.getBorrowRequestsHistory(currentUser.id);
-        Response response = new Response();
-        if(result.isEmpty()){
-            response.status = 400;
-            response.message = "No request history yet";
 
-        }else{
-            response.status = 200;
-            response.message = "requests history retrieved successfully";
-            response.object = result;
+        if(result == null) {
+            returnFailureResponse("No request history yet");
+            return;
         }
+        Response response = new Response();
+        response.status = 200;
+        response.message = "requests history retrieved successfully";
+        response.object = result;
+
         System.out.println("borrow requests history response = " + response);
         communicator.sendResponse(response);
     }
