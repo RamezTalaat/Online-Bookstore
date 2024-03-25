@@ -40,7 +40,7 @@ public class RegistrationController {
             Response response = communicator.receiveResponse();
             if(response.status == 200){
                 RegistrationIsDone = true;
-                if(response.message == "Admin signed in successfully")
+                if(response.message.equals("Admin signed in successfully"))
                     isAdmin = true;
                 currentUser = (User) response.object;
             }else{
