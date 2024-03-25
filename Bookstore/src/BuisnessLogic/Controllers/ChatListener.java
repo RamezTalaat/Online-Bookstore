@@ -14,9 +14,15 @@ public class ChatListener extends Thread{
     @Override
     public void run() {
         String message = "";
-        while (!message.equals("exit chat")){
+        boolean currnetUserExited = false;
+        while (!message.equals("exit chat") && !currnetUserExited){
             if(sender.messageBox.isEmpty()){
                 //System.out.println("sender message box is empty");
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 continue;
             }
 
@@ -25,8 +31,12 @@ public class ChatListener extends Thread{
                 System.out.println("message from listener " + message);
                 receiver.sendMessage(message);
                 sender.messageBox.remove(message);
-                if(message.equals("exit chat"))//to exit loop
+                if(message.equals("exit chat")){//to exit loop
+                    System.out.println("Chat listener exited");
+                    currnetUserExited = true;
                     break;
+                }
+
             }
 
         }

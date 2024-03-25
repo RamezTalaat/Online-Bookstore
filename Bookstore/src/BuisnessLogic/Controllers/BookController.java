@@ -71,6 +71,10 @@ public class BookController {
         return null;
     }
 
+    public boolean updateBookBorrower(int bookId , int borrowerId){
+        String query = "update books set borrowerid='" + borrowerId+ "' where id='" + bookId+"'";
+        return dbConnection.operate(query);
+    }
     public ArrayList<BorrowRequest> getBorrowRequestsHistory(int userid){
         String query = "select * from borrowrequests where borrowerid = '" + userid + "' or lenderid = '" + userid +"'";
         ArrayList<BorrowRequest> result ;

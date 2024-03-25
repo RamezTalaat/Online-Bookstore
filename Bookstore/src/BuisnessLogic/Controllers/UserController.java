@@ -98,7 +98,7 @@ public class UserController {
                     return;
                     //break;
                 }
-                case "accept chat":{
+                case "accept borrow request":{
                     //1. receive borrower id to enter the chat with him and then they both start chatting
                     //2. waiting
                     System.out.println("active users " + ServerCommunicator.getActiveUsers().size());
@@ -108,7 +108,7 @@ public class UserController {
                     // checks current lenders waiting to chat with users
                     System.out.println("in get chat inbox " + currentUser.name);
                     for (int i = 0; i < waitingChats.size(); i++) {
-                        System.out.println("waiting chat " + waitingChats.get(i));
+                        System.out.println("waiting chats for user " +currentUser.name + " =>"+ waitingChats.get(i));
                     }
                     Response response = new Response();
                     response.object = waitingChats;
@@ -279,6 +279,42 @@ public class UserController {
         }
         communicator.sendResponse(response);
     }
+
+    public void acceptBorrowRequest(){
+        String stringRequestId = communicator.receiveMessage(); //waiting for request id
+        Response response = new Response();
+        int requestId = -1;
+        try {
+            requestId = Integer.parseInt(stringRequestId);
+
+        }catch (Exception e){
+            System.out.println("Could not parse request id");
+            returnFailureResponse("Could not parse request id");
+        }
+
+        RequestController requestController = new RequestController();
+
+
+        ArrayList<BorrowRequest> result = requestController.getBorrowRequestById(requestId);
+        if(result == null || result.isEmpty()){
+            returnFailureResponse("Could not accept request properly , wrong request id");
+        }
+
+        BookController bookController = new BookController();
+        BorrowRequest request = result.get(0);
+        Boolean check = bookController.updateBookBorrower(request.bookid,request.borrowerid);
+        if(check)
+            returnSuccessResponse("Request was accepted successfully");
+        else
+            returnFailureResponse("Could not accept request properly");
+
+        check = requestController.acceptBorrowRequest(requestId);
+        if(check)
+            returnSuccessResponse("Request was accepted successfully");
+        else
+            returnFailureResponse("Could not accept request properly");
+
+    }
     public void rejectBorrowRequest(){
         String stringRequestId = communicator.receiveMessage(); //waiting for request id
         Response response = new Response();
@@ -306,26 +342,30 @@ public class UserController {
         try {
             lenderId = Integer.parseInt(stringLenderId);
         }catch (Exception e){
-            returnFailureResponse("Wrong borrower id");
+            e.printStackTrace();
+            //returnFailureResponse("Wrong lender id");
             //break; //to wait for another instruction
         }
+
         //get lender controller
         var activeUsers = ServerCommunicator.getActiveUsers();
         UserController lenderController = null;
         for (int i = 0 ; i < activeUsers.size() ; i++){
             if(lenderId == activeUsers.get(i).currentUser.id){
                 lenderController = activeUsers.get(i);
+                System.out.println("got controller for => " +lenderController.currentUser.name);
                 break;
             }
         }
         //2. entering in chat room
         if(lenderController == null){
-            System.out.println("borrower controller is NULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+            System.out.println("lender controller is NULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
             for (int i = 0 ; i< waitingChats.size() ; i++){
                 System.out.println(currentUser.id + " waiting = " + waitingChats.get(i));
             }
         }
-        handleChat(lenderController);
+        handleChat(lenderController , "borrower");
+        waitingChats.remove(lenderController.currentUser.id);
     }
     public void returnFailureResponse(String message){
         Response response = new Response();
@@ -379,19 +419,36 @@ public class UserController {
         borrowerController.waitingChats.add(currentUser.id);
         returnSuccessResponse("lender is currently waiting for borrower");
 
-        handleChat(borrowerController);
+        handleChat(borrowerController , "lender");
 
 
         //communicator.receiveMessage();
     }
-    public void handleChat(UserController otherUser){
-        System.out.println("in handle chat for user" + currentUser.name);
+    public void handleChat(UserController otherUser , String role){
+        System.out.println("in handle chat for user " + currentUser.name);
         //1. get the otherUser listener thread
-        //communicator.sendMessage("Still waiting for the other chatter!");
-        chatListenerThread = new ChatListener(this ,otherUser.communicator);
-        chatListenerThread.start();
+
+        if(role.equals("borrower")){
+            chatListenerThread = new ChatListener(this ,otherUser.communicator);
+            chatListenerThread.start();
+        }
+
+
+        communicator.sendMessage("NOTIFICATION: Still waiting for the other chatter!");
+        while (otherUser.chatListenerThread == null){//to wait until other chatter enters
+            try {
+                Thread.sleep(100); //to not make request every iteration
+            } catch (InterruptedException e) {
+                System.out.println("Thread sleep time out error");
+                //throw new RuntimeException(e);
+            }
+        }
+        if(role.equals("lender")){
+            chatListenerThread = new ChatListener(this ,otherUser.communicator);
+            chatListenerThread.start();
+        }
         //to make sure both users are
-        communicator.sendMessage("other chatter joined the room");
+        communicator.sendMessage("NOTIFICATION: Other chatter joined the room");
         //2. loop on user data and send it to the other thread
         String message = "";
         while (!message.equals("exit chat")){
@@ -400,6 +457,7 @@ public class UserController {
             messageBox.add(message);
 
         }
+
     }
 
 

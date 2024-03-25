@@ -101,6 +101,8 @@ public class UserController {
         if(inbox == null || inbox.isEmpty())
             return;
 
+
+        ///                           you have to make sure that the lender is still online...........
         System.out.println("*******************************************************");
         System.out.println("*NOTIFICATION: You have waiting chatters in you inbox!*");
         System.out.println("*******************************************************");
@@ -150,6 +152,8 @@ public class UserController {
             return ;
         }
         System.out.println("Note: you are now in the chat room , Enter (exit chat) to exit");
+
+
         ChatListener chatListener = new ChatListener(communicator);
         chatListener.start(); //to start listening thread
         String userInput = "";
@@ -184,14 +188,14 @@ public class UserController {
             printBorrowRequest(pendingRequests.get(i));
         }
 
-        ArrayList<String > optionsArray = new ArrayList<>(Arrays.asList("Accept / Reject a request" , "Go back to menu"));
+        ArrayList<String > optionsArray = new ArrayList<>(Arrays.asList("Accept (by chat) / Reject a request" , "Go back to menu"));
         int choice = inputUserChoice( String.class, optionsArray);
 
         if(choice == 2) //go back to menu
             return;
 
         choice = inputUserChoice( BorrowRequest.class, pendingRequests);
-        System.out.print("You chose request =>" );
+        System.out.print("You chose : " );
         BorrowRequest chosenRequest = pendingRequests.get(choice-1);
         printBorrowRequest(chosenRequest);
         int requestNumber = choice-1;
@@ -208,14 +212,15 @@ public class UserController {
             choice = inputUserChoice(String.class , optionsArray);
             if(choice == 1){
                 //accept request in server side
+                communicator.sendMessage("accept borrow request");
             }
             else{
                 //reject request in server side
                 communicator.sendMessage("reject borrow request");
-                communicator.sendMessage(String.valueOf(pendingRequests.get(requestNumber).id)); //send request id
-                Response response = communicator.receiveResponse();
-                System.out.println(response.message);
             }
+            communicator.sendMessage(String.valueOf(pendingRequests.get(requestNumber).id)); //send request id
+            Response response = communicator.receiveResponse();
+            System.out.println(response.message);
         }
         else{
             //reject request in server side
