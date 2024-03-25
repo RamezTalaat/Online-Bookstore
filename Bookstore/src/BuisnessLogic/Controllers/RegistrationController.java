@@ -40,15 +40,15 @@ public class RegistrationController {
                     Response response ;
                     boolean signInSucc = false;
                     do{
-                        System.out.println("iam here1");
+                        //System.out.println("iam here1");
                         response = authenticator.signIn(userName,password);
-                        System.out.println("iam here2");
+                        //System.out.println("iam here2");
                         communicator.sendResponse(response);
                         if(response.status == 200){
-                            System.out.println("true");
+                            //System.out.println("true");
                             signInSucc = true;
                         }else if(response.status == 404){
-                            System.out.println("iam here3");
+                            //System.out.println("iam here3");
                             communicator.sendResponse(response);
                             userName = communicator.receiveMessage();
                             password = communicator.receiveMessage();
