@@ -24,6 +24,9 @@ public class ReviewController {
     public int rates(int bookId){
         String query = "select * from reviews where bookid='" +  bookId+ "'";
         ArrayList<Review> res = dbConnection.select(Review.class, query);
+        if(res == null || res.isEmpty()){
+            return 0;
+        }
         int sum = 0;
         for (int i = 0; i < res.size(); i++) {
             sum = sum + res.get(i).rate;
