@@ -17,7 +17,8 @@ public class BookController {
         DbConnection dbConnection = new DbConnection();
 
         ArrayList<Book> result = dbConnection.select(Book.class, query);
-        //System.out.println(result.get(0).quantity);
+        if(result == null)
+            return false;
         boolean res;
         if(result.get(0).quantity > 1){
             int numOfBooks = result.get(0).quantity ;
@@ -26,13 +27,8 @@ public class BookController {
             return res;
         }
         String sql = "Delete from books where id ="+bookID;
-        res = dbConnection.operate(sql);
-        if(res){
-            System.out.println("Book deleted Successfully");
-            return true;
-        }
-        System.out.println("There is a problem");
-        return false;
+        return dbConnection.operate(sql);
+
     }
     public ArrayList<Book> searchForBook(String str, String value){
 

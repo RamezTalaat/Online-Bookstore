@@ -43,6 +43,7 @@ public class UserController {
                     break;
                 }
                 case 3: {
+                    removeBook();
                     break;
                 }
                 case 4: {
@@ -93,6 +94,34 @@ public class UserController {
 
     }
 
+    public void removeBook(){
+        communicator.sendMessage("get user books");
+        Response response = communicator.receiveResponse();
+        ArrayList<Book> books = (ArrayList<Book>) response.object ;
+        if(books == null) //no books to remove
+            return;
+
+        int choice = inputUserChoice(Book.class , books);
+        Book chosenBook = books.get(choice-1);
+        System.out.println("Are you sure you want to remove this book from your library:");
+        System.out.println(chosenBook);
+
+        ArrayList<String> choices =  new ArrayList<>(Arrays.asList("YES" , "NO"));
+        choice = inputUserChoice(String.class ,choices);
+        if(choice == 2)
+            return;
+        //System.out.println("book id = " + chosenBook.borrowerid);
+        if(  chosenBook.borrowerid != -1 && chosenBook.borrowerid != 0){
+            System.out.println("Book is already borrowed , can not currently be removed");
+            return;
+        }
+        communicator.sendMessage("remove book");
+        communicator.sendMessage(String.valueOf(chosenBook.id));
+        response = communicator.receiveResponse();
+        System.out.println(response.message); //success or failure
+
+    }
+
     public void checkChatInbox(){
         communicator.sendMessage("get chat inbox");
         Response response = communicator.receiveResponse();
@@ -121,7 +150,6 @@ public class UserController {
         System.out.println("Entering chat with " + chosenBorrower.name);
         enterChat(chosenBorrower.id);
     }
-
     public void enterChat (int lenderId){
         communicator.sendMessage("enter chat with lender");
         communicator.sendMessage(String.valueOf(lenderId));
@@ -244,7 +272,8 @@ public class UserController {
                         System.out.print (i+1 + ". " );
                         printBorrowRequest(request);
                     }
-                }else{
+                }
+                else{
                     for (int i = 0 ; i < choices.size() ; i++){
                         System.out.println(i+1 + ". "+ choices.get(i));
                     }
@@ -277,7 +306,6 @@ public class UserController {
             return (ArrayList<BorrowRequest>) response.object;
         }
     }
-
 
     void printBorrowRequest(BorrowRequest request){
         Book book = getBookById(request.bookid);

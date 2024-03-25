@@ -44,12 +44,15 @@ public class DbConnection {
 
              ObjectMapper mapper = new ObjectMapper();
              while (resultSet.next()) {  //loops on result rows
-
                  T object = mapper.mapObject(tClass,resultSet); //passes object type and result set
                  result.add(object);}
+
+             if(result.isEmpty())
+                 return null;
+
              return result;
          } catch (Exception e) {
-             e.printStackTrace();
+             //e.printStackTrace();
              System.out.println("Error in selection statement");
              return  null;
          }

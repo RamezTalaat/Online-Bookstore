@@ -9,7 +9,6 @@ import Communication.ServerCommunicator;
 import DbContext.DbConnection;
 
 import java.util.ArrayList;
-import java.util.Queue;
 
 public class UserController {
     private ICommunicator communicator;
@@ -66,6 +65,10 @@ public class UserController {
                 }
                 case "add book":{
                     addBook();
+                    break;
+                }
+                case "remove book":{
+                    removeBook();
                     break;
                 }
                 case "add review":{
@@ -125,6 +128,33 @@ public class UserController {
             }
         }
         //Sign out code , close current socket connection
+    }
+
+    public void removeBook(){
+        String stringBookId = communicator.receiveMessage(); //1. get book id
+        int bookId = Integer.parseInt(stringBookId);
+        BookController bookController = new BookController();
+
+        boolean check = true;
+        Book result = bookController.getBookById(bookId);
+        if(result.quantity == 1){
+            ReviewController reviewController = new ReviewController();
+            if(reviewController.getReviewsByBookId(bookId) != null){
+                check = reviewController.removeBookReviews(bookId);
+                if(!check){
+                    System.out.println("reviews not deleted");
+                    returnFailureResponse("could not delete book");
+                }
+            }
+
+        }
+
+        check = bookController.removeBook(bookId); //delete if 1 or more
+        if(!check){
+            returnFailureResponse("could not delete book");
+        }
+        else
+            returnSuccessResponse("Book deleted successfully");
     }
     public void getBorrowRequestHistory(){
         System.out.println("user in get  borrow request history function");
