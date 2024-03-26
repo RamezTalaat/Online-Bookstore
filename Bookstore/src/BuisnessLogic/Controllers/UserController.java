@@ -34,6 +34,10 @@ public class UserController {
                         startChat();
                         break;
                     }
+                    case "get recommendations":{
+                        getUserRecommendations();
+                        break;
+                    }
                     case "enter chat with lender":{
                         enterChatWithLender();
                         break;
@@ -89,7 +93,7 @@ public class UserController {
                             response.status = 200;
                             response.message = "books retrieved successfully";
                             response.object = result;
-                            System.out.println("browse response = " + response);
+                            //System.out.println("browse response = " + response);
                             communicator.sendResponse(response);
                         }
 
@@ -134,9 +138,6 @@ public class UserController {
                     }
                     case "accept borrow request":{
                         acceptBorrowRequest();
-
-//                    System.out.println("active users " + ServerCommunicator.getActiveUsers().size());
-
                         break;
                     }
                     case "get chat inbox":{
@@ -149,11 +150,8 @@ public class UserController {
                         response.object = waitingChats;
                         communicator.sendResponse(response);
                         break;
-                    } case "sign out":{
-                        System.out.println("User Signing out");
-                        //remove user form active users list in server
-                        return;
-                    } case "get accumulative rate by id":{
+                    }
+                    case "get accumulative rate by id":{
                         String id = communicator.receiveMessage();
                         int ID = Integer.parseInt(id);
                         ReviewController reviewController = new ReviewController();
@@ -162,6 +160,11 @@ public class UserController {
                         response.object= rate;
                         communicator.sendResponse(response);
                         break;
+                    }
+                    case "sign out":{
+                        System.out.println("User Signing out");
+                        //remove user form active users list in server
+                        return;
                     }
                     default:{
                         Response response  = new Response();
@@ -175,11 +178,48 @@ public class UserController {
         }
         catch (Exception e){
             System.out.println("Client " + currentUser.name + " closed connection suddenly");
-            return;
         }
     }
 
+    public void getUserRecommendations(){
+        //get genre recommendations
+        ArrayList<Book> recommended = new ArrayList<>() , userBooks, allBooks;
+        ArrayList<String> genres = new ArrayList<>();
+        BookController bookController = new BookController();
+        userBooks = bookController.getUserBooks(currentUser.id);
+        allBooks = bookController.browseBooks();
+        if(allBooks == null){
+            returnFailureResponse("No books to recommend");
+            return;
+        }
 
+        //1. recommend according to user genre preference
+        if(userBooks != null){
+            for (var userBook : userBooks){
+                String genre = userBook.genre;
+                if(genres.contains(genre)) //to take only one book from each genre
+                    continue;
+                for (var book : allBooks){
+                    if(book.id != userBook.id && book.genre.equals(genre) && book.ownerid != currentUser.id
+                            && book.borrowerid != currentUser.id && !recommended.contains(book)){ //to add a new book to recommendations
+                        genres.add(genre);
+                        recommended.add(book);
+                        break;
+                    }
+                }
+            }
+        }
+
+        //2. according to overall genre best rating
+
+
+        Response response = new Response();
+        response.status=200;
+        response.message = "These are the recommended books";
+        response.object = recommended;
+        System.out.println(response);
+        communicator.sendResponse(response);
+    }
     public void removeBook(){
         String stringBookId = communicator.receiveMessage(); //1. get book id
         int bookId = Integer.parseInt(stringBookId);

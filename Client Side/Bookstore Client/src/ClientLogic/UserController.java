@@ -96,7 +96,6 @@ public class UserController {
         catch (Exception e){
             System.out.println("Connection closed suddenly with server");
             System.out.println("Please try connecting again later");
-            return;
 
         }
 
@@ -559,6 +558,41 @@ public class UserController {
     }
 
     public ArrayList<Book> browseBooks() {
+        try {
+            //get recommendations
+            communicator.sendMessage("get recommendations");
+            Response response = communicator.receiveResponse();
+            ArrayList<Book> recommendedBooks = (ArrayList<Book> )response.object;
+            if(recommendedBooks == null || recommendedBooks.isEmpty()){
+                System.out.println("You have no system recommendations");
+            }
+            else {
+                int i = 1;
+                for (var recommendation : recommendedBooks) {
+                    //System.out.println(i++ + ")Recommendation =>" + recommendation);
+                    communicator.sendMessage("get accumulative rate by id");
+                    communicator.sendMessage(String.valueOf(recommendation.id));
+                    response = communicator.receiveResponse();
+                    int rating;
+                    if (response == null || response.object == null || (Integer) response.object == 0)
+                        rating = 0;
+                    rating = (Integer) response.object;
+                    if(rating == 0)
+                        System.out.println(i++ + ")Recommendation =>" + recommendation + "\nAccumulative Rating: [Not Rated Yet]");
+                    else
+                        System.out.println(i++ + ")Recommendation =>" + recommendation + "\nAccumulative Rating: " + rating);
+                }
+                System.out.println("---------------------------------------------------------------------------------");
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+
+
+        ///browse all books and then choose to view one
         communicator.sendMessage("browse");
         Response response = communicator.receiveResponse();
         if (response.status != 200) {
@@ -573,7 +607,8 @@ public class UserController {
             communicator.sendMessage("get accumulative rate by id");
             communicator.sendMessage(String.valueOf(book.id));
             response = communicator.receiveResponse();
-            System.out.print(book+"\n Rate: "+response.object+"\n");
+            System.out.print(book+"\nAccumulative Rating: "+response.object+"\n");
+            //get book reviews too
             return books;
         }
 
@@ -587,7 +622,7 @@ public class UserController {
         try {
             while (num != 4) {
                 System.out.println("1.title");
-                System.out.println("2.auther");
+                System.out.println("2.author");
                 System.out.println("3.genre");
                 System.out.println("4.exit");
                 System.out.print("Please enter number:");
