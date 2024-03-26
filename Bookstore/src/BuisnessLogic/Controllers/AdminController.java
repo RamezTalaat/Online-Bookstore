@@ -25,7 +25,7 @@ public class AdminController {
                     BookController bookController = new BookController();
                     ArrayList<Book> result = bookController.getAvailableBooksAdmin();
                     Response response = new Response();
-                    if(result.isEmpty()){
+                    if(result==null || result.isEmpty()){
                         response.status = 400;
                         response.message = "No books available now";
 
@@ -43,7 +43,7 @@ public class AdminController {
                     BookController bookController = new BookController();
                     ArrayList<Book> result = bookController.getBorrowedBooksAdmin();
                     Response response = new Response();
-                    if(result.isEmpty()){
+                    if(result==null || result.isEmpty()){
                         response.status = 400;
                         response.message = "No books borrowed now";
 
