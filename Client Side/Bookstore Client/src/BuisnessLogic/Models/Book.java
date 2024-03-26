@@ -22,6 +22,6 @@ public class Book implements Serializable {
     @Override
     public String toString() {
         return "Book ,title :" + title + " , price = " + price + " $, author = " + author +
-                "\ngenre = " + genre +  " , quantity = " + quantity + " , description = " + description ;
+                "\ngenre = " + genre +  " , description = " + description ;
     }
 }

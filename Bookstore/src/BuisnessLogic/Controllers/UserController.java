@@ -412,7 +412,6 @@ public class UserController {
         }
         //2. entering in chat room
         if(lenderController == null){
-            System.out.println("lender controller is NULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
             for (int i = 0 ; i< waitingChats.size() ; i++){
                 System.out.println(currentUser.id + " waiting = " + waitingChats.get(i));
             }
@@ -469,7 +468,7 @@ public class UserController {
             }
         }
         if(borrowerController.waitingChats == null){
-            System.out.println("making waiting chats");
+            //System.out.println("making waiting chats");
             borrowerController.waitingChats = new ArrayList<>();
         }
         borrowerController.waitingChats.add(currentUser.id);
@@ -515,6 +514,11 @@ public class UserController {
         }
         //close this user's listening thread
         otherUser.messageBox.add("exit chat");
+        if(otherUser.waitingChats.contains(currentUser.id))
+            otherUser.waitingChats.remove(currentUser.id);
+
+        if(waitingChats.contains(otherUser.currentUser.id))
+            waitingChats.remove(otherUser.currentUser.id);
 
         System.out.println("user " + currentUser.name + "exited chat");
 

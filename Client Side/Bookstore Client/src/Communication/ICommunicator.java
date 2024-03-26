@@ -7,4 +7,6 @@ public interface ICommunicator {
 
     public String receiveMessage();
     public Response receiveResponse();
+
+    public boolean isConnected();
 }

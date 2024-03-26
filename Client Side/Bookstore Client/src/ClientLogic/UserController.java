@@ -137,17 +137,17 @@ public class UserController {
         System.out.println("*******************************************************");
         System.out.println("*NOTIFICATION: You have waiting chatters in you inbox!*");
         System.out.println("*******************************************************");
-        ArrayList<String> choices =  new ArrayList<>(Arrays.asList("Enter a Chat" , "Chat later"));
-        int choice = inputUserChoice(String.class , choices);
-        if(choice == 2)
-            return;
-        choices = new ArrayList<>();
+//        ArrayList<String> choices =  new ArrayList<>(Arrays.asList("Enter a Chat" , "Chat later"));
+//        int choice = inputUserChoice(String.class , choices);
+//        if(choice == 2)
+//            return;
+        ArrayList<String> choices = new ArrayList<>();
         System.out.println("Choose a user to chat with:");
         for (int i =0 ; i < inbox.size() ; i++){
             User lender = getUserById(inbox.get(i));
             choices.add(lender.name);
         }
-        choice = inputUserChoice(String.class , choices);
+        int choice = inputUserChoice(String.class , choices);
 
         User chosenBorrower = getUserById(inbox.get(choice-1));
         System.out.println("Entering chat with " + chosenBorrower.name);
@@ -174,7 +174,7 @@ public class UserController {
         communicator.sendMessage("start chat with borrower");
         communicator.sendMessage(String.valueOf(borrowerId));
         Response response = communicator.receiveResponse();
-        System.out.println("start chat response"+response);
+        //System.out.println("start chat response"+response);
         if(response.status == 200){
             System.out.println(response.message);
         }
@@ -276,7 +276,7 @@ public class UserController {
                         System.out.print (i+1 + ". " );
                         printBorrowRequest(request);
                     }
-                }else if(tClass == Book.class){
+                }else if(tClass == Book.class){ 
                     for(int i = 0 ;i < choices.size() ; i++){
                         Book book = (Book) choices.get(i);
                         System.out.print(i+1+")");
