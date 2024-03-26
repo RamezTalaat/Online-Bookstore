@@ -55,35 +55,24 @@ public class UserController {
                         System.out.println("user in browse function");
                         BookController bookController = new BookController();
                         ArrayList<Book> result = bookController.browseBooks();
-                        Response response = new Response();
                         if(result == null || result.isEmpty()){
-                            response.status = 400;
-                            response.message = "No books to browse now";
+                            returnFailureResponse("No books to browse now");
 
                         }else{
-                            response.status = 200;
-                            response.message = "books retrieved successfully";
-                            response.object = result;
+                            returnSuccessResponse("books retrieved successfully" , result);
                         }
-                        System.out.println("browse response = " + response);
-                        communicator.sendResponse(response);
+
                         break;
                     }
                     case"sort by genre": {
                         BookController bookController = new BookController();
                         ArrayList<Book> result = bookController.browseByGenre();
-                        Response response = new Response();
                         if (result == null || result.isEmpty()) {
-                            response.status = 400;
-                            response.message = "No books to browse now";
+                            returnFailureResponse("No books to browse now");
                         }
                         else{
-                            response.status = 200;
-                            response.message = "books that are sorted by genre retrieved successfully";
-                            response.object = result;
+                            returnSuccessResponse("books that are sorted by genre retrieved successfully" , result);
                         }
-                        System.out.println("browse by genre response = " + response);
-                        communicator.sendResponse(response);
                         break;
                     }
                     case "get all books":{
@@ -91,15 +80,8 @@ public class UserController {
                         ArrayList<Book> result = bookController.browseBooks();
                         if(result == null || result.isEmpty()){
                             returnFailureResponse("No books to browse now");
-                            break;
-
                         }else{
-                            Response response = new Response();
-                            response.status = 200;
-                            response.message = "books retrieved successfully";
-                            response.object = result;
-                            //System.out.println("browse response = " + response);
-                            communicator.sendResponse(response);
+                            returnSuccessResponse("books retrieved successfully" , result);
                         }
 
                         break;
@@ -172,10 +154,7 @@ public class UserController {
                         return;
                     }
                     default:{
-                        Response response  = new Response();
-                        response.status = 400;
-                        response.message = "Error : Server could not parse request properly , please try again ";
-                        communicator.sendResponse(response);
+                        returnFailureResponse("Error : Server could not parse request properly , please try again ");
                         break;
                     }
                 }
@@ -264,14 +243,7 @@ public class UserController {
             recommended.add(highestRate);
 
         }
-
-
-        Response response = new Response();
-        response.status=200;
-        response.message = "These are the recommended books";
-        response.object = recommended;
-        System.out.println(response);
-        communicator.sendResponse(response);
+        returnSuccessResponse("These are the recommended books",recommended);
     }
     public void removeBook(){
         String stringBookId = communicator.receiveMessage(); //1. get book id
@@ -308,13 +280,9 @@ public class UserController {
             returnFailureResponse("No request history yet");
             return;
         }
-        Response response = new Response();
-        response.status = 200;
-        response.message = "requests history retrieved successfully";
-        response.object = result;
+        System.out.println("borrow requests history response = " + result);
 
-        System.out.println("borrow requests history response = " + response);
-        communicator.sendResponse(response);
+        returnSuccessResponse( "requests history retrieved successfully",result);
     }
 
     public void search(){
@@ -325,15 +293,11 @@ public class UserController {
         Response response = new Response();
         ArrayList<Book> listOfBooks = bookController.searchForBook(str,value);
         if(!listOfBooks.isEmpty()){
-            response.status = 200;
-            response.message ="list of books returned";
-            response.object=listOfBooks;
+            returnSuccessResponse("list of books returned",listOfBooks);
         }else{
-            response.status=400;
-            response.message="there is no books with this "+str;
+            returnFailureResponse("there is no books with this "+str);
         }
-        System.out.println("the returned value is "+response);
-        communicator.sendResponse(response);
+        //System.out.println("the returned value is "+listOfBooks);
     }
     public void getBookById(){
         System.out.println("user in get book by id function");
@@ -343,15 +307,11 @@ public class UserController {
         Book result = bookController.getBookById(bookId);
         Response response = new Response();
         if(result == null){
-            response.status = 400;
-            response.message = "No book with this id";
+            returnFailureResponse("No book with this id");
 
         }else{
-            response.status = 200;
-            response.message = "book retrieved successfully";
-            response.object = result;
+            returnSuccessResponse("book retrieved successfully" ,result );
         }
-        communicator.sendResponse(response);
     }
     public void getUserById(){
         String stringUserId = communicator.receiveMessage();
@@ -362,15 +322,12 @@ public class UserController {
         ArrayList<User> result  = dbConnection.select(User.class , query);
         Response response = new Response();
         if(result == null || result.isEmpty()){
-            response.status = 400;
-            response.message = "No user with this id";
+            returnFailureResponse("No user with this id");
 
         }else{
-            response.status = 200;
-            response.message = "user retrieved successfully";
-            response.object = result.get(0); //to return user object not wrapped in list
+            returnSuccessResponse("user retrieved successfully",result.get(0));//to return user object not wrapped in list
         }
-        communicator.sendResponse(response);
+
     }
     public void getUserBooks(){
         BookController bookController = new BookController();
@@ -379,10 +336,7 @@ public class UserController {
         if(result==null || result.isEmpty()){
             returnFailureResponse("No books to in your library yet");
         }else{
-            response.status = 200;
-            response.message = "books retrieved successfully";
-            response.object = result;
-            communicator.sendResponse(response);
+            returnSuccessResponse("books retrieved successfully" ,result );
         }
 
     }
@@ -430,21 +384,18 @@ public class UserController {
         int userId = Integer.parseInt(stringUserID);
         int bookId = Integer.parseInt(stringBookID);
         boolean result = requestController.submitBorrowRequest(userId , bookId);
-        Response response = new Response();
+
         if(result){
-            response.status = 200;
-            response.message = "book borrow request submitted successfully";
+            returnSuccessResponse("book borrow request submitted successfully");
         }else{
-            response.status = 400;
-            response.message = "could not submit borrow request!";
+            returnFailureResponse("could not submit borrow request!");
         }
-        communicator.sendResponse(response);
+
     }
 
     public void acceptBorrowRequest(){
         System.out.println("in accept request");
         String stringRequestId = communicator.receiveMessage(); //waiting for request id
-        Response response = new Response();
         int requestId = -1;
         try {
             requestId = Integer.parseInt(stringRequestId);
@@ -480,7 +431,6 @@ public class UserController {
     }
     public void rejectBorrowRequest(){
         String stringRequestId = communicator.receiveMessage(); //waiting for request id
-        Response response = new Response();
         int requestId = -1;
         try {
             requestId = Integer.parseInt(stringRequestId);
@@ -641,10 +591,6 @@ public class UserController {
             }
                 otherUser.waitingChats.remove((Object)currentUser.id);
         }
-
-//
-//        if(waitingChats.contains(otherUser.currentUser.id))
-//            waitingChats.remove(otherUser.currentUser.id);
 
         System.out.println("user " + currentUser.name + "exited chat");
 
