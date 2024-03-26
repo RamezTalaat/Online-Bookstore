@@ -112,17 +112,17 @@ public class BookController {
         DbConnection dbConnection = new DbConnection();
         String query = "";
         //check if this user already has this book to increase quantity
-//        query = "select * from books where price='" + price + "' and genre='" + genre +  "' and title='" + title +
-//                "' and author='" + author +  "' and description='" +
-//                description+"' and ownerid='" + currentUserID+"'";
-//        var books = dbConnection.select(Book.class , query);
-//        if(books != null){
-//            query = "update books set quantity='" + (quantity+ books.get(0).quantity) +"' where id='" + books.get(0).id + "'";
-//            return dbConnection.operate(query);
-//        }
+        query = "select * from books where price='" + price + "' and genre='" + genre +  "' and title='" + title +
+                "' and author='" +author+  "' and description='" +
+                description+"' and ownerid='" + currentUserID+"'";
+        var books = dbConnection.select(Book.class , query);
+        if(books != null && !books.isEmpty()){
+            query = "update books set quantity='" + (quantity+ books.get(0).quantity) +"' where id='" + books.get(0).id + "'";
+            return dbConnection.operate(query);
+        }
 
         query = "insert into books (price ,genre ,title, author, quantity, description, ownerid) values ('" + price + "' , '" + genre + "' , '"
-                +title+"' , '" +author + "' , '"+quantity+"', '"+description+"', '"+currentUserID+"')";
+                +title+"' , '"+author+"' , '"+quantity+"', '"+description+"', '"+currentUserID+"')";
         return dbConnection.operate(query);
 
     }

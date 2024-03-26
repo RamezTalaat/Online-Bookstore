@@ -363,15 +363,10 @@ public class UserController {
         int intQuantity = Integer.parseInt(quantity);
 
         Response response = new Response();
-        int iterations = intQuantity;
         boolean check = true;
-        while (iterations-- != 0){
-            check= bookController.addBook(doublePrice , genre , title , author , 1 , description, currentUser.id);
-            if(!check)
-                returnFailureResponse("Book (" + title+ ") Could not be added successfully");
-
-        }
-
+        check = bookController.addBook(doublePrice , genre , title , author , intQuantity , description, currentUser.id);
+        if(!check)
+            returnFailureResponse("Book (" + title+ ") Could not be added successfully");
         returnSuccessResponse("Book (" + title+ ") added successfully!");
     }
     public void borrowRequest(){

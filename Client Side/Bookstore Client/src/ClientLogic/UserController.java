@@ -679,11 +679,12 @@ public class UserController {
                         }
                         return result;
                     }
-                } else {
+                } else if(num <= 0 || num > 4){
                     System.out.println("Please Enter valid input");
                 }
 
             }
+            handleUser();
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
