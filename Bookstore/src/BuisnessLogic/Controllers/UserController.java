@@ -3,6 +3,7 @@ package BuisnessLogic.Controllers;
 import BuisnessLogic.Authentication.Response;
 import BuisnessLogic.Models.Book;
 import BuisnessLogic.Models.BorrowRequest;
+import BuisnessLogic.Models.Review;
 import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
 import Communication.ServerCommunicator;
@@ -36,6 +37,10 @@ public class UserController {
                     }
                     case "get recommendations":{
                         getUserRecommendations();
+                        break;
+                    }
+                    case "get book reviews":{
+                        getBookReviews();
                         break;
                     }
                     case "enter chat with lender":{
@@ -181,6 +186,17 @@ public class UserController {
         }
     }
 
+    public void getBookReviews(){
+        String stringBookId = communicator.receiveMessage();
+        int bookId = Integer.parseInt(stringBookId);
+        ReviewController reviewController = new ReviewController();
+        ArrayList<Review> reviews =reviewController.getReviewsByBookId(bookId);
+        if(reviews == null || reviews.isEmpty()){
+            returnFailureResponse("No reviews yet");
+            return ;
+        }
+        returnSuccessResponse("Reviews retrieved successfully" , reviews);
+    }
     public void getUserRecommendations(){
         //get genre recommendations
         ArrayList<Book> recommended = new ArrayList<>() , userBooks, allBooks;
@@ -211,6 +227,43 @@ public class UserController {
         }
 
         //2. according to overall genre best rating
+        genres = new ArrayList<>();
+        for(var book : allBooks){
+            if(genres.contains(book.genre))
+                continue;
+            genres.add(book.genre);
+            var highest =  bookController.getHighestRatedBookInGenre(book.genre);
+            if(highest == null)
+                continue;
+            Book highestRate = highest.get(0);
+            System.out.println("highest rated in " + highestRate.genre + " = " + highestRate.title);
+
+//            for(var alreadyOwned : userBooks){
+//                if(alreadyOwned.id == book.id){
+//
+//                }
+//            }
+            boolean isAlreadyRecommendedOrOwned = false;
+            for (var temp : userBooks){
+                if(temp.id == highestRate.id){
+                    isAlreadyRecommendedOrOwned = true;
+                    break;
+                }
+            }
+            if(isAlreadyRecommendedOrOwned)
+                continue;
+            for (var temp : recommended){
+                if(temp.id == highestRate.id){
+                    isAlreadyRecommendedOrOwned = true;
+                    break;
+                }
+            }
+            if(isAlreadyRecommendedOrOwned)
+                continue;
+
+            recommended.add(highestRate);
+
+        }
 
 
         Response response = new Response();
@@ -486,6 +539,13 @@ public class UserController {
         Response response = new Response();
         response.status = 200;
         response.message = message;
+        communicator.sendResponse(response);
+    }
+    public void returnSuccessResponse(String message,Object object){
+        Response response = new Response();
+        response.status = 200;
+        response.message = message;
+        response.object = object;
         communicator.sendResponse(response);
     }
     public void startChat(){

@@ -145,6 +145,13 @@ public class BookController {
         }
         return true;
     }
+
+    public ArrayList<Book> getHighestRatedBookInGenre(String genre){
+        String query = "select b.* from books as b join reviews r on b.id=r.bookid where b.genre='" + genre+ "' " +
+                "group by b.id order by AVG(r.rate) DESC LIMIT 1";
+
+        return dbConnection.select(Book.class , query);
+    }
     public ArrayList<Book> getAvailableBooksAdmin()
     {
         String query = "SELECT * FROM books WHERE borrowerid IS NULL";

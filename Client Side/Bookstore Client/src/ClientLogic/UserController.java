@@ -3,6 +3,7 @@ package ClientLogic;
 import BuisnessLogic.Authentication.Response;
 import BuisnessLogic.Models.Book;
 import BuisnessLogic.Models.BorrowRequest;
+import BuisnessLogic.Models.Review;
 import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
 
@@ -607,8 +608,24 @@ public class UserController {
             communicator.sendMessage("get accumulative rate by id");
             communicator.sendMessage(String.valueOf(book.id));
             response = communicator.receiveResponse();
-            System.out.print(book+"\nAccumulative Rating: "+response.object+"\n");
-            //get book reviews too
+            System.out.println(book+"\nAccumulative Rating: "+response.object);
+
+
+            communicator.sendMessage("get book reviews");
+            communicator.sendMessage(String.valueOf(book.id));
+            response = communicator.receiveResponse();
+            if(response.status == 200){
+                ArrayList<Review> reviews = (ArrayList<Review>) response.object;
+                int i = 1;
+                System.out.println("Reviews:\n--------");
+                for(var review: reviews){
+                    System.out.println(i++ + ") rate: " + review.rate + " , comment: " + review.comment);
+                }
+            }
+            else{
+                System.out.println("No review yet on this book");
+            }
+
             return books;
         }
 
