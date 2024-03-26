@@ -60,6 +60,23 @@ public class UserController {
                         communicator.sendResponse(response);
                         break;
                     }
+                    case"sort by genre": {
+                        BookController bookController = new BookController();
+                        ArrayList<Book> result = bookController.browseByGenre();
+                        Response response = new Response();
+                        if (result == null || result.isEmpty()) {
+                            response.status = 400;
+                            response.message = "No books to browse now";
+                        }
+                        else{
+                            response.status = 200;
+                            response.message = "books that are sorted by genre retrieved successfully";
+                            response.object = result;
+                        }
+                        System.out.println("browse by genre response = " + response);
+                        communicator.sendResponse(response);
+                        break;
+                    }
                     case "get all books":{
                         BookController bookController = new BookController();
                         ArrayList<Book> result = bookController.browseBooks();

@@ -98,6 +98,12 @@ public class BookController {
         result = dbConnection.select(Book.class,query);
         return result;
     }
+    public ArrayList<Book> browseByGenre(){
+        String query = "SELECT * FROM books ORDER BY genre";
+        ArrayList<Book> result ;
+        result = dbConnection.select(Book.class,query);
+        return result;
+    }
     public Boolean addBook(double price, String genre, String title, String author, int quantity, String description, int currentUserID) {
         if (genre == null || title == null || author == null || quantity ==0 || currentUserID<0) {
             System.out.println("Can't accept null values or qty equals to 0");
