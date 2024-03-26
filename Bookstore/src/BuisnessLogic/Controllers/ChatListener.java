@@ -33,6 +33,7 @@ public class ChatListener extends Thread{
                 if(message.equals("exit chat")){//to exit loop
                     System.out.println("Chat listener exited");
                     currnetUserExited = true;
+                    sender.messageBox.clear();
                     break;
                 }
 
