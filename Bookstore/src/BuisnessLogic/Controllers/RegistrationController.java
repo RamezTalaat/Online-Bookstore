@@ -16,71 +16,78 @@ public class RegistrationController {
         communicator = _communicator;
     }
     public void handleClientRequest(){
-        String userChoice = "";
-        boolean userRegistered = false , isAdmin = false;
-        User currentUser = null;
+        try {
+            String userChoice = "";
+            boolean userRegistered = false , isAdmin = false;
+            User currentUser = null;
 
-        while (!userRegistered && !userChoice.equals("exit") ){
+            while (!userRegistered && !userChoice.equals("exit") ){
 
-            userChoice = communicator.receiveMessage();
-            if(userChoice == null)
-                continue;
-            switch (userChoice){
-                case "sign up":{
-                    System.out.println("in sign up");
-                    String name = communicator.receiveMessage();
-                    String userName = communicator.receiveMessage();
-                    String password = communicator.receiveMessage();
-                    IAuthenticator authenticator = new UserAuthenticator();
-                    Response response = authenticator.signUp(name , userName , password);
-                    communicator.sendResponse(response);
-                    if(response.status == 200){
-                        userRegistered = true;
-                        currentUser = (User) response.object;
-                    }
-
-
-                    break;
-                }
-                case "sign in":{
-                    String userName = communicator.receiveMessage();
-                    String password = communicator.receiveMessage();
-                    IAuthenticator authenticator = new UserAuthenticator();
-                    Response response = authenticator.signIn(userName,password);
-                    communicator.sendResponse(response);
-                    if(response.status == 200){
-                        userRegistered = true;
-                        if(response.message.equals("Admin signed in successfully")){
-                            isAdmin = true;
+                userChoice = communicator.receiveMessage();
+                if(userChoice == null)
+                    continue;
+                switch (userChoice){
+                    case "sign up":{
+                        System.out.println("in sign up");
+                        String name = communicator.receiveMessage();
+                        String userName = communicator.receiveMessage();
+                        String password = communicator.receiveMessage();
+                        IAuthenticator authenticator = new UserAuthenticator();
+                        Response response = authenticator.signUp(name , userName , password);
+                        communicator.sendResponse(response);
+                        if(response.status == 200){
+                            userRegistered = true;
+                            currentUser = (User) response.object;
                         }
-                        currentUser = (User) response.object;
+
+
+                        break;
                     }
-                    break;
-                }
-                case "exit":{
-                    return;
-                }
-                default:{
-                    Response response = new Response();
-                    response.status = 400;
-                    response.message = "Could not understand registration option";
+                    case "sign in":{
+                        String userName = communicator.receiveMessage();
+                        String password = communicator.receiveMessage();
+                        IAuthenticator authenticator = new UserAuthenticator();
+                        Response response = authenticator.signIn(userName,password);
+                        communicator.sendResponse(response);
+                        if(response.status == 200){
+                            userRegistered = true;
+                            if(response.message.equals("Admin signed in successfully")){
+                                isAdmin = true;
+                            }
+                            currentUser = (User) response.object;
+                        }
+                        break;
+                    }
+                    case "exit":{
+                        return;
+                    }
+                    default:{
+                        Response response = new Response();
+                        response.status = 400;
+                        response.message = "Could not understand registration option";
 
-                    communicator.sendResponse(response);
+                        communicator.sendResponse(response);
 
-                    break;
+                        break;
+                    }
                 }
             }
+            if(userRegistered && isAdmin){
+                AdminController adminController = new AdminController(communicator);
+                adminController.handleAdmin();
+            }else{
+                //System.out.println("iam here signIN");
+                UserController userController = new UserController(communicator ,currentUser );
+                //add user to active list
+                ServerCommunicator.addActiveUser(userController);
+                userController.handleUser();
+            }
         }
-        if(userRegistered && isAdmin){
-            AdminController adminController = new AdminController(communicator);
-            adminController.handleAdmin();
-        }else{
-            //System.out.println("iam here signIN");
-            UserController userController = new UserController(communicator ,currentUser );
-            //add user to active list
-            ServerCommunicator.addActiveUser(userController);
-            userController.handleUser();
+        catch (Exception e){
+            System.out.println("Client closed connection suddenly");
+            return;
         }
+
     }
 
 

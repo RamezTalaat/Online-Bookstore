@@ -25,136 +25,141 @@ public class UserController {
     }
 
     public void handleUser(){
-        String choice;
-        while (true){
-            choice = communicator.receiveMessage();
-            switch (choice){
-                case "start chat with borrower":{
-                    startChat();
-                    break;
-                }
-                case "enter chat with lender":{
-                    enterChatWithLender();
-                    break;
-                }
-                case "reject borrow request":{
-                    rejectBorrowRequest();
-                    break;
-                }
-                case "browse":{
-                    System.out.println("user in browse function");
-                    BookController bookController = new BookController();
-                    ArrayList<Book> result = bookController.browseBooks();
-                    Response response = new Response();
-                    if(result == null || result.isEmpty()){
-                        response.status = 400;
-                        response.message = "No books to browse now";
-
-                    }else{
-                        response.status = 200;
-                        response.message = "books retrieved successfully";
-                        response.object = result;
-                    }
-                    System.out.println("browse response = " + response);
-                    communicator.sendResponse(response);
-                    break;
-                }
-                case "get all books":{
-                    BookController bookController = new BookController();
-                    ArrayList<Book> result = bookController.browseBooks();
-                    if(result == null || result.isEmpty()){
-                        returnFailureResponse("No books to browse now");
+        try {
+            String choice;
+            while (true){
+                choice = communicator.receiveMessage();
+                switch (choice){
+                    case "start chat with borrower":{
+                        startChat();
                         break;
-
-                    }else{
+                    }
+                    case "enter chat with lender":{
+                        enterChatWithLender();
+                        break;
+                    }
+                    case "reject borrow request":{
+                        rejectBorrowRequest();
+                        break;
+                    }
+                    case "browse":{
+                        System.out.println("user in browse function");
+                        BookController bookController = new BookController();
+                        ArrayList<Book> result = bookController.browseBooks();
                         Response response = new Response();
-                        response.status = 200;
-                        response.message = "books retrieved successfully";
-                        response.object = result;
+                        if(result == null || result.isEmpty()){
+                            response.status = 400;
+                            response.message = "No books to browse now";
+
+                        }else{
+                            response.status = 200;
+                            response.message = "books retrieved successfully";
+                            response.object = result;
+                        }
                         System.out.println("browse response = " + response);
                         communicator.sendResponse(response);
+                        break;
                     }
+                    case "get all books":{
+                        BookController bookController = new BookController();
+                        ArrayList<Book> result = bookController.browseBooks();
+                        if(result == null || result.isEmpty()){
+                            returnFailureResponse("No books to browse now");
+                            break;
 
-                    break;
+                        }else{
+                            Response response = new Response();
+                            response.status = 200;
+                            response.message = "books retrieved successfully";
+                            response.object = result;
+                            System.out.println("browse response = " + response);
+                            communicator.sendResponse(response);
+                        }
 
-                }
-                case "borrow request":{
-                    borrowRequest();
-                    break;
-                }
-                case "add book":{
-                    addBook();
-                    break;
-                }
-                case "remove book":{
-                    removeBook();
-                    break;
-                }
-                case "add review":{
-                    addReview();
-                    break;
-                }
-                case "get user books":{
-                    getUserBooks();
-                    break;
-                }
-                case "get user by id":{
-                    getUserById();
-                    break;
-                }
-                case "get book by id":{
-                    getBookById();
-                    break;
-                }
-                case "get borrow request history":{
-                    getBorrowRequestHistory();
-                    break;
-                }
-                case "search":{
-                    search();
-                    break;
-                }
-                case "accept borrow request":{
-                    acceptBorrowRequest();
+                        break;
+
+                    }
+                    case "borrow request":{
+                        borrowRequest();
+                        break;
+                    }
+                    case "add book":{
+                        addBook();
+                        break;
+                    }
+                    case "remove book":{
+                        removeBook();
+                        break;
+                    }
+                    case "add review":{
+                        addReview();
+                        break;
+                    }
+                    case "get user books":{
+                        getUserBooks();
+                        break;
+                    }
+                    case "get user by id":{
+                        getUserById();
+                        break;
+                    }
+                    case "get book by id":{
+                        getBookById();
+                        break;
+                    }
+                    case "get borrow request history":{
+                        getBorrowRequestHistory();
+                        break;
+                    }
+                    case "search":{
+                        search();
+                        break;
+                    }
+                    case "accept borrow request":{
+                        acceptBorrowRequest();
 
 //                    System.out.println("active users " + ServerCommunicator.getActiveUsers().size());
 
-                    break;
-                }
-                case "get chat inbox":{
-                    // checks current lenders waiting to chat with users
-                    System.out.println("in get chat inbox " + currentUser.name);
-                    for (int i = 0; i < waitingChats.size(); i++) {
-                        System.out.println("waiting chats for user " +currentUser.name + " =>"+ waitingChats.get(i));
+                        break;
                     }
-                    Response response = new Response();
-                    response.object = waitingChats;
-                    communicator.sendResponse(response);
-                    break;
-                } case "sign out":{
-                    System.out.println("User Signing out");
-                    //remove user form active users list in server
-                    return;
-                } case "get accumulative rate by id":{
-                    String id = communicator.receiveMessage();
-                    int ID = Integer.parseInt(id);
-                    ReviewController reviewController = new ReviewController();
-                    int rate = reviewController.rates(ID);
-                    Response response = new Response();
-                    response.object= rate;
-                    communicator.sendResponse(response);
-                    break;
-                }
-                default:{
-                    Response response  = new Response();
-                    response.status = 400;
-                    response.message = "Error : Server could not parse request properly , please try again ";
-                    communicator.sendResponse(response);
-                    break;
+                    case "get chat inbox":{
+                        // checks current lenders waiting to chat with users
+                        System.out.println("in get chat inbox " + currentUser.name);
+                        for (int i = 0; i < waitingChats.size(); i++) {
+                            System.out.println("waiting chats for user " +currentUser.name + " =>"+ waitingChats.get(i));
+                        }
+                        Response response = new Response();
+                        response.object = waitingChats;
+                        communicator.sendResponse(response);
+                        break;
+                    } case "sign out":{
+                        System.out.println("User Signing out");
+                        //remove user form active users list in server
+                        return;
+                    } case "get accumulative rate by id":{
+                        String id = communicator.receiveMessage();
+                        int ID = Integer.parseInt(id);
+                        ReviewController reviewController = new ReviewController();
+                        int rate = reviewController.rates(ID);
+                        Response response = new Response();
+                        response.object= rate;
+                        communicator.sendResponse(response);
+                        break;
+                    }
+                    default:{
+                        Response response  = new Response();
+                        response.status = 400;
+                        response.message = "Error : Server could not parse request properly , please try again ";
+                        communicator.sendResponse(response);
+                        break;
+                    }
                 }
             }
         }
-        //Sign out code , close current socket connection
+        catch (Exception e){
+            System.out.println("Client " + currentUser.name + " closed connection suddenly");
+            return;
+        }
     }
 
 
@@ -462,7 +467,7 @@ public class UserController {
         }
         //2. waiting in chat room
         if(borrowerController == null){
-            System.out.println("borrower controller is NULLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL");
+            System.out.println("borrower controller is NULL");
             for (int i = 0 ; i< waitingChats.size() ; i++){
                 System.out.println(currentUser.id + " waiting = " + waitingChats.get(i));
             }
@@ -514,11 +519,20 @@ public class UserController {
         }
         //close this user's listening thread
         otherUser.messageBox.add("exit chat");
-        if(otherUser.waitingChats.contains(currentUser.id))
-            otherUser.waitingChats.remove(currentUser.id);
+        if(role.equals("lender")){
+            if(otherUser.waitingChats.contains(currentUser.id)){
+                for (int i=0 ; i<otherUser.waitingChats.size() ; i++){
+                    if(otherUser.waitingChats.get(i) == currentUser.id){
+                        otherUser.waitingChats.remove(i);
+                    }
+                }
+            }
+                otherUser.waitingChats.remove((Object)currentUser.id);
+        }
 
-        if(waitingChats.contains(otherUser.currentUser.id))
-            waitingChats.remove(otherUser.currentUser.id);
+//
+//        if(waitingChats.contains(otherUser.currentUser.id))
+//            waitingChats.remove(otherUser.currentUser.id);
 
         System.out.println("user " + currentUser.name + "exited chat");
 

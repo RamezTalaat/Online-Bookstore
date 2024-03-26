@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Scanner;
 
 public class UserController {
     private final User currentUser;
@@ -26,72 +25,81 @@ public class UserController {
 
 
     public void handleUser() {
-        ArrayList<String > optionsArray = new ArrayList<>(Arrays.asList("View Your Books Library" ,
-                "Add A Book To Your Library" , "Remove A Book From Your Library" ,
-                "Check Incoming Borrow Requests (ex. Accept/Reject incoming requests & Chat with borrower)" ,
-                "Check Borrow Your Requests History" , "Browse Books Library" , "Search Books (ex. Search by title , author , genre)",
-                "Borrow A Book (submit a borrow request)", "Add a review using Book ID" , "Sign Out"));
-        int choice = inputUserChoice(String.class , optionsArray);
-        while (true) {// sign out breaks this loop
-            switch (choice) {
-                case 1: {
-                    getUserBooks();
-                    break;
-                }
-                case 2: {
-                    addBook();
-                    break;
-                }
-                case 3: {
-                    removeBook();
-                    break;
-                }
-                case 4: {
-                    checkRequestsInbox();
-                    break;
-                }
-                case 5: {
-                    var requests = getBorrowRequestHistory();
-                    if(requests == null || requests.isEmpty())
+        try {
+            ArrayList<String > optionsArray = new ArrayList<>(Arrays.asList("View Your Books Library" ,
+                    "Add A Book To Your Library" , "Remove A Book From Your Library" ,
+                    "Check Incoming Borrow Requests (ex. Accept/Reject incoming requests & Chat with borrower)" ,
+                    "Check Borrow Your Requests History" , "Browse Books Library" , "Search Books (ex. Search by title , author , genre)",
+                    "Borrow A Book (submit a borrow request)", "Add a review using Book ID" , "Sign Out"));
+            int choice = inputUserChoice(String.class , optionsArray);
+            while (true) {// sign out breaks this loop
+                switch (choice) {
+                    case 1: {
+                        getUserBooks();
                         break;
-
-                    for (int i = 0 ; i < requests.size() ; i++){
-                        System.out.print(i+1 + ") ");
-                        printBorrowRequest(requests.get(i));
                     }
-                    break;
-                }
-                case 6: {
-                    browseBooks();
-                    break;
-                }
-                case 7: {
-                    search();
-                    break;
-                }
-                case 8: {
-                    submitABorrowRequest();
-                    break;
-                }
-                case 9:
-                {
-                    addReview();
-                    break;
-                }
-                case 10: {
-                    communicator.sendMessage("sign out");
-                    System.out.println("Good Bye!");
-                    return;
-                }
-                default: {
-                    System.out.println("Good Bye!");
-                    return;
-                }
+                    case 2: {
+                        addBook();
+                        break;
+                    }
+                    case 3: {
+                        removeBook();
+                        break;
+                    }
+                    case 4: {
+                        checkRequestsInbox();
+                        break;
+                    }
+                    case 5: {
+                        var requests = getBorrowRequestHistory();
+                        if(requests == null || requests.isEmpty())
+                            break;
 
+                        for (int i = 0 ; i < requests.size() ; i++){
+                            System.out.print(i+1 + ") ");
+                            printBorrowRequest(requests.get(i));
+                        }
+                        break;
+                    }
+                    case 6: {
+                        browseBooks();
+                        break;
+                    }
+                    case 7: {
+                        search();
+                        break;
+                    }
+                    case 8: {
+                        submitABorrowRequest();
+                        break;
+                    }
+                    case 9:
+                    {
+                        addReview();
+                        break;
+                    }
+                    case 10: {
+                        communicator.sendMessage("sign out");
+                        System.out.println("Good Bye!");
+                        return;
+                    }
+                    default: {
+                        System.out.println("Unfortunately , and unexpected operation occurred , working on solving this soon!");
+                        return;
+                    }
+
+                }
+                checkChatInbox(); //to chat with book lenders
+                choice = inputUserChoice(String.class , optionsArray);
             }
-            checkChatInbox(); //to chat with book lenders
-            choice = inputUserChoice(String.class , optionsArray);
         }
+        catch (Exception e){
+            System.out.println("Connection closed suddenly with server");
+            System.out.println("Please try connecting again later");
+            return;
+
+        }
+
 
     }
 
@@ -170,7 +178,7 @@ public class UserController {
         }
 
     }
-    public void startChat (int borrowerId){
+    public boolean startChat (int borrowerId){
         communicator.sendMessage("start chat with borrower");
         communicator.sendMessage(String.valueOf(borrowerId));
         Response response = communicator.receiveResponse();
@@ -180,7 +188,7 @@ public class UserController {
         }
         else{
             System.out.println(response.message);
-            return ;
+            return false ;
         }
         System.out.println("Note: you are now in the chat room , Enter (exit chat) to exit");
 
@@ -196,6 +204,7 @@ public class UserController {
                 System.out.println("Error : we could not understand/send your input, please try again");
             }
         }
+        return true;
     }
     public void checkRequestsInbox(){
         //get pending requests
@@ -236,7 +245,9 @@ public class UserController {
         //communicator.sendMessage("handle borrow request");
         if(choice == 1){
             //start chat
-            startChat(chosenRequest.borrowerid);
+            boolean isActive = startChat(chosenRequest.borrowerid);
+            if(!isActive)
+                return;
             //check if user wants to accept or reject
             System.out.println("After chatting with the potential borrower , would you like to :");
             optionsArray = new ArrayList<>(Arrays.asList("Accept" , "Reject"));
@@ -312,7 +323,7 @@ public class UserController {
             System.out.println("Looks like you have no borrow requests history yet");
             return null;
         } else {
-            System.out.println("borrow request history object = " + response.object);
+            //System.out.println("borrow request history object = " + response.object);
             return (ArrayList<BorrowRequest>) response.object;
         }
     }

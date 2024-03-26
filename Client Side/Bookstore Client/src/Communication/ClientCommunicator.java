@@ -87,7 +87,7 @@ public class ClientCommunicator implements ICommunicator {
             response = (Response) objectInputStream.readObject();
             return response;
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             System.out.println("Error : Problem in receiving server response!");
         }
         return null;
@@ -105,7 +105,7 @@ public class ClientCommunicator implements ICommunicator {
             outputStream.writeUTF(message);
         } catch (Exception e) {
             //throw new RuntimeException(e);
-            System.out.println("Error in sending message (" + message + ") to server ");
+            System.out.println("Error in sending message  to server ");
         }
     }
 }

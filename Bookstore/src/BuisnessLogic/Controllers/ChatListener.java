@@ -1,6 +1,5 @@
 package BuisnessLogic.Controllers;
 
-import BuisnessLogic.Models.User;
 import Communication.ICommunicator;
 
 public class ChatListener extends Thread{

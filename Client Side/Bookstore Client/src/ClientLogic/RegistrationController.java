@@ -18,45 +18,49 @@ public class RegistrationController {
     }
 
     public void registerClient(){
-        boolean RegistrationIsDone  = false, isAdmin = false;
-        User currentUser = null;
-        while (!RegistrationIsDone){
-            int choice = -1 ; //Wrong input handling loop
-            while (choice == -1){
-                choice = printRegistrationMenu();
+        try {
+            boolean RegistrationIsDone  = false, isAdmin = false;
+            User currentUser = null;
+            while (!RegistrationIsDone){
+                int choice = -1 ; //Wrong input handling loop
+                while (choice == -1){
+                    choice = printRegistrationMenu();
+                }
+                if(choice == 3) {//exit condition
+                    communicator.sendMessage("exit");
+                    return;
+                }
+                if(choice == 1){//sign up
+                    communicator.sendMessage("sign up");
+                    singUp();
+                }
+                else{
+                    communicator.sendMessage("sign in");
+                    signIn();
+                }
+                Response response = communicator.receiveResponse();
+                if(response.status == 200){
+                    RegistrationIsDone = true;
+                    if(response.message.equals("Admin signed in successfully"))
+                        isAdmin = true;
+                    currentUser = (User) response.object;
+                }else{
+                    System.out.println("status = " + response.status); //in SRS
+                    System.out.println("PROBLEM:" + response.message);
+                }
             }
-            if(choice == 3) {//exit condition
-                communicator.sendMessage("exit");
-                return;
-            }
-            if(choice == 1){//sign up
-                communicator.sendMessage("sign up");
-                singUp();
-            }
-            else{
-                communicator.sendMessage("sign in");
-                signIn();
-            }
-            Response response = communicator.receiveResponse();
-            if(response.status == 200){
-                RegistrationIsDone = true;
-                if(response.message.equals("Admin signed in successfully"))
-                    isAdmin = true;
-                currentUser = (User) response.object;
+            if(isAdmin){
+                AdminController adminController = new AdminController(communicator ); // not implemented yet
+                adminController.handleAdmin();
             }else{
-                System.out.println("status = " + response.status); //in SRS
-                System.out.println("PROBLEM:" + response.message);
+                UserController userController = new UserController(communicator ,currentUser);
+                userController.handleUser();
             }
         }
-        if(isAdmin){
-            AdminController adminController = new AdminController(communicator ); // not implemented yet
-            adminController.handleAdmin();
-        }else{
-            UserController userController = new UserController(communicator ,currentUser);
-            userController.handleUser();
+        catch (Exception e){
+            System.out.println("Server closed connection suddenly after establishing a connection");
+            return;
         }
-
-
     }
 
     public int printRegistrationMenu(){
@@ -83,7 +87,7 @@ public class RegistrationController {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             System.out.println("Error : please enter a valid input");
         }
         return -1;
