@@ -17,6 +17,12 @@ public class RequestController {
         if(books.size() != 1)
             return false;
         int lenderId = books.get(0).ownerid;
+        query = "select * from borrowrequests where bookid = '" + bookid + "' AND borrowerid='" + userid +"'";
+        var result = dbConnection.select(BorrowRequest.class,query);
+        if(result!=null)
+        {
+            return false;
+        }
         query = "insert into borrowrequests (lenderid , borrowerid , bookid , status) values ('"
                 + lenderId + "' , '" + userid + "' , '" +bookid + "' , 'pending')" ;//status = pending by default
 
