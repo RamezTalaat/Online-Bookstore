@@ -543,6 +543,11 @@ public class UserController {
             System.out.println("You already are the owner of this book");
             return;
         }
+        if (books.get(accessBookNumberIndex).borrowerid == currentUser.id) {
+            System.out.println(books.get(accessBookNumberIndex));
+            System.out.println("You already are the borrower of this book");
+            return;
+        }
 
         communicator.sendMessage("borrow request");
         communicator.sendMessage(String.valueOf(currentUser.id)); // convert to strings

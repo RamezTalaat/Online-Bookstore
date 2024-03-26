@@ -300,7 +300,6 @@ public class UserController {
         //System.out.println("the returned value is "+listOfBooks);
     }
     public void getBookById(){
-        System.out.println("user in get book by id function");
         BookController bookController = new BookController();
         String stringBookId = communicator.receiveMessage();
         int bookId = Integer.parseInt(stringBookId);
@@ -455,8 +454,9 @@ public class UserController {
         try {
             lenderId = Integer.parseInt(stringLenderId);
         }catch (Exception e){
-            e.printStackTrace();
-            //returnFailureResponse("Wrong lender id");
+            //e.printStackTrace();
+            System.out.println("wrong lender id");
+            returnFailureResponse("Wrong lender id");
             //break; //to wait for another instruction
         }
 
@@ -582,17 +582,15 @@ public class UserController {
         //close this user's listening thread
         otherUser.messageBox.add("exit chat");
         if(role.equals("lender")){
-            if(otherUser.waitingChats.contains(currentUser.id)){
-                for (int i=0 ; i<otherUser.waitingChats.size() ; i++){
-                    if(otherUser.waitingChats.get(i) == currentUser.id){
-                        otherUser.waitingChats.remove(i);
-                    }
+            for (int i=0 ; i<otherUser.waitingChats.size() ; i++){
+                if(otherUser.waitingChats.get(i) == currentUser.id){
+                    otherUser.waitingChats.remove(i);
                 }
             }
-                otherUser.waitingChats.remove((Object)currentUser.id);
         }
 
-        System.out.println("user " + currentUser.name + "exited chat");
+        System.out.println("user " + currentUser.name + " exited chat");
+        chatListenerThread = null;
 
     }
 

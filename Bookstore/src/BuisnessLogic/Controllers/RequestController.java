@@ -17,7 +17,7 @@ public class RequestController {
         if(books.size() != 1)
             return false;
         int lenderId = books.get(0).ownerid;
-        query = "select * from borrowrequests where bookid = '" + bookid + "' AND borrowerid='" + userid +"'";
+        query = "select * from borrowrequests where bookid = '" + bookid + "' AND borrowerid='" + userid +"' and status!='rejected'" ;
         var result = dbConnection.select(BorrowRequest.class,query);
         if(result!=null)
         {
