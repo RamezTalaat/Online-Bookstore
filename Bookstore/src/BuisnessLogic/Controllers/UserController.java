@@ -211,6 +211,43 @@ public class UserController {
         }
 
         //2. according to overall genre best rating
+        genres = new ArrayList<>();
+        for(var book : allBooks){
+            if(genres.contains(book.genre))
+                continue;
+            genres.add(book.genre);
+            var highest =  bookController.getHighestRatedBookInGenre(book.genre);
+            if(highest == null)
+                continue;
+            Book highestRate = highest.get(0);
+            System.out.println("highest rated in " + highestRate.genre + " = " + highestRate.title);
+
+//            for(var alreadyOwned : userBooks){
+//                if(alreadyOwned.id == book.id){
+//
+//                }
+//            }
+            boolean isAlreadyRecommendedOrOwned = false;
+            for (var temp : userBooks){
+                if(temp.id == highestRate.id){
+                    isAlreadyRecommendedOrOwned = true;
+                    break;
+                }
+            }
+            if(isAlreadyRecommendedOrOwned)
+                continue;
+            for (var temp : recommended){
+                if(temp.id == highestRate.id){
+                    isAlreadyRecommendedOrOwned = true;
+                    break;
+                }
+            }
+            if(isAlreadyRecommendedOrOwned)
+                continue;
+
+            recommended.add(highestRate);
+
+        }
 
 
         Response response = new Response();
